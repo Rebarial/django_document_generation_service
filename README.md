@@ -9,6 +9,8 @@
 
 ``` bash
 git clone https://github.com/Rebarial/django_document_generation_service
+
+cd django_document_generation_service
 ```
 По желанию создайте виртуальное окружение
 
@@ -28,7 +30,6 @@ source venv/bin/activate
 Измените SECRET_KEY в django_document_generation_service/.env
 
 ``` bash
-cd django_document_generation_service
 
 python -m pip install -r requirements.txt
 
