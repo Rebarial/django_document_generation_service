@@ -10,7 +10,22 @@
 ``` bash
 git clone https://github.com/Rebarial/django_document_generation_service
 ```
-change SECRET_KEY in django_document_generation_service/.env
+По желанию создайте виртуальное окружение
+
+Windows:
+``` bash
+python -m venv venv
+
+venv\Scripts\activate
+```
+Linux/macOS:
+``` bash
+python3 -m venv venv
+
+source venv/bin/activate
+```
+
+Измените SECRET_KEY в django_document_generation_service/.env
 
 ``` bash
 cd django_document_generation_service
