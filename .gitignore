@@ -1,8 +1,5 @@
-taskManager/db.sqlite3
 venv/
 __pycache__
-test.py
-test
 .env
 temp.pdf
 temp.xlsx
