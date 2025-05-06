@@ -1,4 +1,13 @@
 upd_dict = {
+    "break_points": [
+        24, 29, 32, 
+    ],
+    #Не пригодилось, у всех столбцов константый размер, в python = 1
+    "cells_settings": {
+        "column_size": 0.55,
+        "first_column": "A",
+        "last_column": "FI",
+        },
     "raw_data": {
         "invoice_number": ("AP", 2),#"AP2",
         "correction_number": ("AP", 4),#"AP4",

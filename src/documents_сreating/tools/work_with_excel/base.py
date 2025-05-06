@@ -3,10 +3,14 @@ import os
 from io import BytesIO
 from documents_сreating.models.base import BaseModel
 from openpyxl.utils import range_boundaries, get_column_letter
+from openpyxl.utils.cell import column_index_from_string, coordinate_from_string
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.drawing.image import Image as XLImage
+from openpyxl.styles import Font
 from django.core.files.storage import default_storage
 from typing import BinaryIO
+import math
+import subprocess
 
 class BaseExcelDocumentCreate(ABC):
     """
@@ -14,13 +18,14 @@ class BaseExcelDocumentCreate(ABC):
     """
 
     def __init__(self, document_dict: dict, template_path: str):
-        self.document_dict = document_dict
-        self.template_path = template_path
+        self.document_dict: dict = document_dict
+        self.template_path: str = template_path
 
     @abstractmethod
     def create_excel_document(self, document: BaseModel) -> BinaryIO:
         """
         Создает excel документ на основе шаблона и словаря заполнения
+        PS сейчас возвращает pdf
         """
         pass
 
@@ -41,15 +46,18 @@ class BaseExcelDocumentCreate(ABC):
         """
         merge_areas = []
         merge_items = []
+        merge_items_name = None
         offset = 0
-
         #Заполняем список координат объедененных ячеек после строки с таблицы
         for mrg in sheet.merged_cells.ranges:
-            strt_col, start_row, end_col, end_row = range_boundaries(str(mrg))  # получаем границы объединённой области
+            start_col, start_row, end_col, end_row = range_boundaries(str(mrg))  # получаем границы объединённой области
             if start_row >= cell_itmes_number: 
                 merge_areas.append(mrg)
-            if start_row >= cell_itmes_number and end_row <= cell_itmes_number:
-                merge_items.append(mrg) 
+            elif start_row >= cell_itmes_number-1 and end_row <= cell_itmes_number-1:
+                merge_items.append(mrg)
+                if start_col == 18:
+                    merge_items_name = mrg
+                
 
         #Сохраняем высоту строк
         row_heights = {}
@@ -70,6 +78,7 @@ class BaseExcelDocumentCreate(ABC):
          })
         
         offset = items.count()
+        default_items_height = sheet.row_dimensions[cell_itmes_number].height
 
         #Добавляем строки и заполняем
         for i, item in enumerate(items.all()):
@@ -86,20 +95,23 @@ class BaseExcelDocumentCreate(ABC):
             if "items" in self.document_dict:
                 for key, cell_ref in self.document_dict["items"].items():
                     if hasattr(item, key) and getattr(item, key):
-                        sheet[f'{cell_ref}{number_of_row}'] = str(getattr(item, key))
+                        value = str(getattr(item, key))
+                        sheet[f'{cell_ref}{number_of_row}'] = value
+
+                    if key == 'name':
+                        if merge_items_name:
+                            coords = range_boundaries(str(merge_items_name))
+                            column_width = int(coords[2]) - int(coords[0])
+                            sheet.row_dimensions[cell_itmes_number + i].height = self.calculate_row_height(value, target_cell.font, column_width)
 
             for area in merge_items:
                 coords = range_boundaries(str(area))
-                adjusted_area = f'{get_column_letter(coords[0])}{coords[1]+i}:{get_column_letter(coords[2])}{coords[3]+i}'
+                adjusted_area = f'{get_column_letter(coords[0])}{number_of_row}:{get_column_letter(coords[2])}{number_of_row}'
                 sheet.merge_cells(adjusted_area)
 
         #Возвращаем высоту строк после добавления
         for row, height in row_heights.items():
             sheet.row_dimensions[row + offset].height = height
-
-        #Присваеваем высоту добавленным строкам
-        for i in range(1,offset):
-            sheet.row_dimensions[cell_itmes_number + i].height = sheet.row_dimensions[cell_itmes_number].height
 
         #Соединяем зоны после добавления строк
         for area in merge_areas:
@@ -108,3 +120,144 @@ class BaseExcelDocumentCreate(ABC):
             sheet.merge_cells(adjusted_area)
 
         return offset
+    
+    def calculate_row_height(self, text: str, font: Font, column_width: float) -> float:
+        """
+        Расчитывает выстоту строки
+        """
+        line_spacing = 1.5
+
+        lines = text.split('\n')
+        #print(f"{column_width}, {font.size}")
+        approx_chars_per_line = math.floor(column_width / (font.size / 7))
+
+        if not approx_chars_per_line:
+            #print(text)
+            approx_chars_per_line = 1
+
+        num_lines = 0
+
+        for line in lines:
+            num_lines += math.ceil(len(line) / approx_chars_per_line)
+
+        #print(f'{approx_chars_per_line}:{num_lines}:{len(lines[0])}')
+        return font.size  * num_lines * line_spacing
+    
+    def row_height_from_content(self, sheet: Worksheet, value: str, cell_ref: str) -> None:
+        """
+        Изменяет высоту строки на основе контента
+        """
+        col_number, row_number = coordinate_from_string(cell_ref)
+        row_number = int(row_number)
+        new_height = self.calculate_row_height(value, sheet[cell_ref].font, self.get_merged_column_count(sheet, cell_ref))
+        if not sheet.row_dimensions[row_number].height or new_height > sheet.row_dimensions[row_number].height:
+            sheet.row_dimensions[row_number].height = new_height
+        #print(f'{cell_ref}: {value}: {sheet.row_dimensions[row_number].height}')
+
+    def get_merged_column_count(self, sheet: Worksheet, cell_ref: str) -> int:
+        """
+        Функция возвращает количество столбцов у объедененной ячейки
+        """
+        col_number, row_number = coordinate_from_string(cell_ref)
+        col_number = column_index_from_string(col_number)
+        row_number = int(row_number)
+
+        for mrg in sheet.merged_cells.ranges:
+            start_col, start_row, end_col, end_row = range_boundaries(str(mrg))  # получаем границы объединённой области
+            if start_col <= col_number <= end_col and start_row <= row_number <= end_row:
+                return end_col - start_col
+            
+        return 1
+
+    def read_and_return_file(self, file_path: str) -> BytesIO:
+        with open(file_path, 'rb') as f:
+            data = f.read()
+        buffer = BytesIO(data)
+        buffer.seek(0)
+        return buffer
+
+    def toPDF_libre(self, file_path: str) -> BytesIO:
+
+        base_dir = os.path.dirname(file_path)
+        filename = os.path.basename(file_path).split('.')[0]
+        out_file = os.path.join(base_dir, f'{filename}.pdf')
+
+        #libreoffice_path = 'C:\\Program Files\\LibreOffice\\program\\soffice.exe'
+        libreoffice_path = '/usr/bin/soffice'
+
+        if not os.path.exists(file_path):
+            print(f"Ошибка! Файл '{file_path}' не найден.")
+        else:
+            command = [
+                libreoffice_path, '--headless',
+                '--convert-to', 'pdf',
+                '--outdir', base_dir,
+                file_path,
+            ]
+            
+            try:
+                result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                if result.returncode != 0:
+                    raise Exception(result.stderr.decode())
+                else:
+                    return self.read_and_return_file(out_file)
+            except Exception as err:
+                print(f"Ошибка при преобразовании: {err}")
+
+    """
+    def toPDF_win32(self, file_name: str):
+        file_path = 'C:\\Users\\reber\\PycharmProjects\\UPD\\src\\' + file_name
+        pythoncom.CoInitialize()
+        
+        excel = None
+        workbook = None
+        
+        try:
+            # Открываем Excel
+            excel = client.Dispatch("Excel.Application")
+            excel.Visible = False  # Скрываем окно Excel
+
+            # Открываем файл
+            workbook = excel.Workbooks.Open(file_path)
+            
+            worksheet = workbook.Worksheets[0]
+
+            #worksheet.HPageBreaks.Add(Before=worksheet.Rows(21)) Разрывы
+
+            # Конвертируем в PDF
+            out_file = file_path.replace('.xlsx', '.pdf')
+            worksheet.ExportAsFixedFormat(0, out_file)
+
+            return self.read_and_return_file(out_file)
+            
+        except Exception as e:
+            print(f"Ошибка при конвертации: {e}")
+            raise
+            
+        finally:
+            if workbook:
+                workbook.Close(SaveChanges=False)
+            if excel:
+                excel.Quit()
+            pythoncom.CoUninitialize()
+
+    def toPDF_spire(self, file_path: str):
+        
+        workbook = Workbook()
+        workbook.LoadFromFile(file_path)
+        for sheet in workbook.Worksheets:
+            pageSetup = sheet.PageSetup
+            pageSetup.TopMargin = 0.3
+            pageSetup.BottomMargin = 0.3
+            pageSetup.LeftMargin = 0.3
+            pageSetup.RightMargin = 0.3
+
+        workbook.ConverterSetting.SheetFitToPage = True
+        
+        out_file = file_path.replace('.xlsx', '.pdf')
+
+        workbook.SaveToFile(out_file, FileFormat.PDF)
+        workbook.Dispose()
+
+        self.read_and_return_file(out_file)
+    """        
