@@ -4,7 +4,7 @@
 ## Реализовано
  - админка http://127.0.0.1:8000/admin/
  - APIView для документов UPD http://127.0.0.1:8000/api/upd/
- - частично реализовано создание UPD документа в xlsx формате http://127.0.0.1:8000/api/upd/{id} (extra actions) или http://127.0.0.1:8000/api/upd/{id}/libre
+ - реализовано создание UPD документа в pdf формате http://127.0.0.1:8000/api/upd/{id} (extra actions) или http://127.0.0.1:8000/api/upd/{id}/libre
 ## Установка
 Необходим docker и docker-copose
 
@@ -80,3 +80,11 @@ docker-compose up --build --force-recreate -d
        - class Currency(BaseModel):
        - class DocumentType(BaseModel):
        - class SellerStatus(BaseModel):
+      
+## Узкие места
+ - tools\work_with_excel\base.py
+   - get_merged_column_count(sheet, cell_ref) – Перебирает все объединенные колонки пока не найдет ту, которая содержит cell_ref. Используется везде при вставки текстовых данных в excel
+   - toPDF_libre(file_path) – Возможны ошибки с доступом к файлу (например, если файл уже открыт другим процессом)
+ - tools\work_with_excel\upd.py
+   - create_excel_document(document, converter) – Считывает данные с шаблона xlsx возможны проблемы с доступом
+
