@@ -4,12 +4,13 @@ from rest_framework.decorators import action
 from ..serializers import DocumentUPDSerializer
 from ..tools.work_with_excel.upd import upd_excel_document_create
 from django.http import HttpResponse
+from typing import Callable
 
 class DocumentUPDViewSet(viewsets.ModelViewSet):
     queryset = DocumentUPD.objects.all()
     serializer_class = DocumentUPDSerializer
     
-    def create_doc(self, pk, func):
+    def create_doc(self, pk: int, func: Callable):
         document = DocumentUPD.objects.get(id=pk)
 
         excel_document = upd_excel_document_create.create_excel_document(document, func)
