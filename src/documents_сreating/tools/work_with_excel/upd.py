@@ -1,8 +1,6 @@
 from .base import BaseExcelDocumentCreate
 from documents_сreating.models.base import BaseModel
 from openpyxl import load_workbook
-from openpyxl.worksheet.pagebreak import Break
-from openpyxl.worksheet.worksheet import Worksheet
 from ..layout_parameters_dictionary.upd import upd_dict
 from io import BytesIO
 from documents_сreating.models.organization import Organization
@@ -15,77 +13,6 @@ class UPDExcelDocumentCreate(BaseExcelDocumentCreate):
 
     def __init__(self, document_dict: dict, template_path: str):
         super().__init__(document_dict, template_path)
-
-    def get_cell_ref(self, key: tuple[str, int], cell_itmes_number: int, offset: int) -> str:
-        """
-        Возвращает строковое представление ссылки excel на основе кортежа, учитывая смещение при добавлении items
-        """
-        num = key[1]
-        if cell_itmes_number and num > cell_itmes_number: 
-            num += offset
-        return f"{key[0]}{num}"
-
-    def find_nearest_lesser_or_equal(self, numbers: tuple, target: int) -> int:
-
-        lesser_or_equal_numbers = [num for num in numbers if num <= target]
-        
-        if not lesser_or_equal_numbers:
-            return None
-        
-        return max(lesser_or_equal_numbers)
-
-    def add_rows_break(self, sheet: Worksheet, break_points: list, offset: int, items_row: int) -> None:
-
-        break_points = [point if point <= items_row else point + offset for point in break_points]
-
-        last_row = sheet.max_row + 2 # +2 строки для печати
-        i = 1
-        start_items_row = items_row - 2 # -2: Добавил шапку и 0 строку
-        end_items_row = items_row + offset + 1 # + 1: Добавил колонку итогов
-        row_height_sum = 0
-        start_id = 0
-        max_height_on_list = 530 #530 - размер листа
-
-        while i <= last_row:
-            
-            if not row_height_sum: #Для отладки
-                start_id = i
-
-            #Если превышаем максимальный размер, то разрываем на ближайшем break_point < i
-            if sheet.row_dimensions[i].height:
-                row_height_sum += sheet.row_dimensions[i].height
-            else:
-                row_height_sum += 11.25
-            
-            if row_height_sum < max_height_on_list:
-                i += 1
-            else:
-                #print(f'Break:number: {i} - sum: {row_height_sum}')
-                if start_items_row <= i <= end_items_row:
-                    i += 1
-                    row_height_sum = 0
-                else:
-                    break_point = self.find_nearest_lesser_or_equal(break_points, i)
-                    if not break_point:
-                        row_height_sum = 0
-                        i += 1
-                    else:
-                        i = break_point
-                        sheet.row_breaks.append(Break(id=i))
-
-                        '''
-                        #Отладочная код, возможно надо будет вернутся к функции
-                        test_sum = 0
-                        for j in range(start_id, i):
-                            if sheet.row_dimensions[j].height:
-                                test_sum += sheet.row_dimensions[j].height
-                            else:
-                                test_sum += 11.25
-                        print(f'test sum = {test_sum}')
-                        '''
-                        i += 1
-                        row_height_sum = 0
-       #print(f'{start_id} : {i} : {row_height_sum}: {self.find_nearest_lesser_or_equal(break_points, i)}')
 
     def create_excel_document(self, document: BaseModel, converter: Callable) -> BytesIO:
 
