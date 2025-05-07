@@ -27,12 +27,12 @@ class UPDExcelDocumentCreate(BaseExcelDocumentCreate):
 
     def find_nearest_lesser_or_equal(self, numbers: tuple, target: int) -> int:
 
-        lesser_numbers = [num for num in numbers if num <= target]
+        lesser_or_equal_numbers = [num for num in numbers if num <= target]
         
-        if not lesser_numbers:
+        if not lesser_or_equal_numbers:
             return None
         
-        return max(lesser_numbers)
+        return max(lesser_or_equal_numbers)
 
     def add_rows_break(self, sheet: Worksheet, break_points: list, offset: int, items_row: int) -> None:
 
@@ -60,7 +60,7 @@ class UPDExcelDocumentCreate(BaseExcelDocumentCreate):
             if row_height_sum < max_height_on_list:
                 i += 1
             else:
-                print(f'Oh, Nooo: {i} - {row_height_sum}')
+                #print(f'Break:number: {i} - sum: {row_height_sum}')
                 if start_items_row <= i <= end_items_row:
                     i += 1
                     row_height_sum = 0
@@ -99,8 +99,8 @@ class UPDExcelDocumentCreate(BaseExcelDocumentCreate):
 
         #!!Нужно добавить все колонки и подсчет сумм
         if "cell_itmes_number" in self.document_dict:
-            cell_itmes_number = self.document_dict["cell_itmes_number"]
-            offset = self.add_document_itmes(sheet, document.items_docs, cell_itmes_number)
+            cell_itmes_number = self.document_dict["cell_itmes_number"] #Номер строки с которой начинаются строки товаров
+            offset = self.add_document_itmes(sheet, document.items_docs, cell_itmes_number) #Количество строк товаров
 
         if "Images" in self.document_dict:
 
