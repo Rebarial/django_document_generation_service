@@ -38,7 +38,7 @@ class UPDExcelDocumentCreate(BaseExcelDocumentCreate):
 
         break_points = [point if point <= items_row else point + offset for point in break_points]
 
-        last_row = sheet.max_row + 3
+        last_row = sheet.max_row + 2 # +2 строки для печати
         i = 1
         start_items_row = items_row - 2 # -2: Добавил шапку и 0 строку
         end_items_row = items_row + offset + 1 # + 1: Добавил колонку итогов
@@ -60,6 +60,7 @@ class UPDExcelDocumentCreate(BaseExcelDocumentCreate):
             if row_height_sum < max_height_on_list:
                 i += 1
             else:
+                print(f'Oh, Nooo: {i} - {row_height_sum}')
                 if start_items_row <= i <= end_items_row:
                     i += 1
                     row_height_sum = 0
@@ -84,7 +85,7 @@ class UPDExcelDocumentCreate(BaseExcelDocumentCreate):
                         '''
                         i += 1
                         row_height_sum = 0
-        #print(f'{start_id} : {i} : {row_height_sum}: {self.find_nearest_lesser_or_equal(break_points, i)}')
+       #print(f'{start_id} : {i} : {row_height_sum}: {self.find_nearest_lesser_or_equal(break_points, i)}')
 
     def create_excel_document(self, document: BaseModel, converter: Callable) -> BytesIO:
 

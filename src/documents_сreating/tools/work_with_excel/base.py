@@ -78,7 +78,6 @@ class BaseExcelDocumentCreate(ABC):
          })
         
         offset = items.count()
-        default_items_height = sheet.row_dimensions[cell_itmes_number].height
 
         #Добавляем строки и заполняем
         for i, item in enumerate(items.all()):

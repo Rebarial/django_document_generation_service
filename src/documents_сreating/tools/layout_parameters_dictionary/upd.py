@@ -36,8 +36,8 @@ upd_dict = {
             {
                 "type": "stamp",
                 "cell": ("C", 43),
-                "width": 120,
-                "height": 120
+                "width": 110,
+                "height": 110
             },
             {
                 "type": "signature",
