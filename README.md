@@ -6,40 +6,14 @@
  - APIView для документов UPD http://127.0.0.1:8000/api/upd/
  - частично реализовано создание UPD документа в xlsx формате http://127.0.0.1:8000/api/upd/{id} (extra actions) или http://127.0.0.1:8000/api/upd/{id}/download
 ## Установка
+Необходим docker и docker-copose
 
 ``` bash
 git clone https://github.com/Rebarial/django_document_generation_service
 
 cd django_document_generation_service
-```
-По желанию создайте виртуальное окружение
 
-Windows:
-``` bash
-python -m venv venv
-
-venv\Scripts\activate
-```
-Linux/macOS:
-``` bash
-python3 -m venv venv
-
-source venv/bin/activate
-```
-
-Измените SECRET_KEY в django_document_generation_service/.env
-
-``` bash
-
-python -m pip install -r requirements.txt
-
-cd src
-
-python manage.py makemigrations
-
-python manage.py migrate
-
-python manage.py runserver
+docker-compose up --build --force-recreate -d
 ```
 
 ## Сущности
