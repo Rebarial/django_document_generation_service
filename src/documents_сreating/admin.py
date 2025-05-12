@@ -1,8 +1,9 @@
 from django.contrib import admin
 from .models import (
     Organization, DocumentUPD, PaymentDocument, 
-    ShipmentDocument, DocumentItem, VatRate, 
-    Currency, DocumentType, SellerStatus
+    ShipmentDocument, UPDItem, VatRate, 
+    Currency, DocumentType, SellerStatus,
+    DocumentInvoiceForPayment, InvoiceForPaymentItem
 )
 
 class PaymentDocumentInline(admin.TabularInline):
@@ -15,18 +16,29 @@ class ShipmentDocumentInline(admin.TabularInline):
     extra = 0
     fields = ('name', 'number', 'date')
 
-class DocumentItemInline(admin.TabularInline):
-    model = DocumentItem
+class UPDItemInline(admin.TabularInline):
+    model = UPDItem
     extra = 0
     fields = ('code', 'name', 'quantity', 'price', 'amount')
 
 @admin.register(DocumentUPD)
 class DocumentUPDAdmin(admin.ModelAdmin):
-    inlines = [PaymentDocumentInline, ShipmentDocumentInline, DocumentItemInline]
+    inlines = [PaymentDocumentInline, ShipmentDocumentInline, UPDItemInline]
     list_display = ('invoice_number', 'invoice_date', 'seller_name', 'customer_name')
     list_filter = ('invoice_number','invoice_date', 'seller_name', 'customer_name')
     search_fields = ('invoice_number', 'seller_name', 'customer_name')
     date_hierarchy = 'invoice_date'
+
+class InvoiceForPaymentItemInLine(admin.TabularInline):
+    model = InvoiceForPaymentItem
+    extra = 0
+    fields = ("name", "quantity", "unit", "price", "sum")
+
+
+@admin.register(DocumentInvoiceForPayment)
+class DocumentInvoiceForPayment(admin.ModelAdmin):
+    inlines = [InvoiceForPaymentItemInLine]
+
 
 admin.site.register(Organization)
 admin.site.register(VatRate)

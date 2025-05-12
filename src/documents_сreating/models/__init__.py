@@ -1,6 +1,7 @@
 from .base import BaseModel
 from .organization import Organization
-from .documents import DocumentUPD, PaymentDocument, ShipmentDocument, DocumentItem
+from .documents.upd import DocumentUPD, PaymentDocument, ShipmentDocument, UPDItem
+from .documents.invoice_for_payment import DocumentInvoiceForPayment, InvoiceForPaymentItem
 from .reference import VatRate, Currency, DocumentType, SellerStatus
 
 __all__ = [
@@ -9,7 +10,9 @@ __all__ = [
     'DocumentUPD',
     'PaymentDocument',
     'ShipmentDocument',
-    'DocumentItem',
+    'UPDItem',
+    'DocumentInvoiceForPayment',
+    'InvoiceForPaymentItem',
     'VatRate',
     'Currency',
     'DocumentType',  

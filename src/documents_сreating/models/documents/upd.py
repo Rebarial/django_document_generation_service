@@ -1,10 +1,7 @@
 from django.db import models
-from .base import BaseModel
-from .organization import Organization
-from .reference import VatRate, Currency, DocumentType, SellerStatus
-
-class BaseDocument(BaseModel):
-    pass
+from ..base import BaseModel
+from ..reference import VatRate, Currency, DocumentType, SellerStatus
+from .base import BaseDocument
 
 class PaymentDocument(BaseModel):
     upd = models.ForeignKey('DocumentUPD', on_delete=models.CASCADE, related_name='payment_docs', verbose_name='УПД')
@@ -25,7 +22,7 @@ class ShipmentDocument(BaseModel):
         verbose_name = 'Документ об отгрузке'
         verbose_name_plural = 'Документы об отгрузке'
 
-class DocumentItem(BaseModel):
+class UPDItem(BaseModel):
     upd = models.ForeignKey('DocumentUPD', on_delete=models.CASCADE, related_name='items_docs', verbose_name='УПД')
     code = models.CharField(max_length=50, blank=True, null=True, verbose_name='Код товара')
     name = models.CharField(max_length=255, blank=True, null=True, verbose_name='Наименование')

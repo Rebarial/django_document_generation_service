@@ -1,7 +1,8 @@
 from rest_framework import fields, serializers
 from .models import (
     Organization, VatRate, Currency, DocumentType, SellerStatus,
-    DocumentUPD, PaymentDocument, ShipmentDocument, DocumentItem
+    DocumentUPD, PaymentDocument, ShipmentDocument, UPDItem,
+    DocumentInvoiceForPayment, InvoiceForPaymentItem
     )
 
 class OrganizationSerializer(serializers.ModelSerializer):
@@ -34,9 +35,9 @@ class SellerStatusSerializer(serializers.ModelSerializer):
         model = SellerStatus
         fields = '__all__'
 
-class DocumentItemSerializer(serializers.ModelSerializer):
+class UPDItemSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DocumentItem
+        model = UPDItem 
         fields = '__all__'
 
 
@@ -53,8 +54,18 @@ class ShipmentDocumentSerializer(serializers.ModelSerializer):
 class DocumentUPDSerializer(serializers.ModelSerializer):
     payment_docs = PaymentDocumentSerializer(many=True, required=False)
     shipment_docs = ShipmentDocumentSerializer(many=True, required=False)
-    items_docs = DocumentItemSerializer(many=True, required=False)
+    items_docs = UPDItemSerializer(many=True, required=False)
     class Meta:
         model = DocumentUPD
         fields = '__all__'
 
+class InvoiceForPaymentItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvoiceForPaymentItem 
+        fields = '__all__'
+
+class DocumentInvoiceForPaymentSerializer(serializers.ModelSerializer):
+    items_docs = InvoiceForPaymentItemSerializer(many=True, required=False)
+    class Meta:
+        model = DocumentInvoiceForPayment
+        fields = '__all__'
