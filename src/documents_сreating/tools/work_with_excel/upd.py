@@ -3,7 +3,6 @@ from documents_сreating.models.base import BaseModel
 from openpyxl import load_workbook
 from ..layout_parameters_dictionary.upd import upd_dict
 from io import BytesIO
-from documents_сreating.models.organization import Organization
 import locale
 from typing import Callable
 
@@ -24,7 +23,9 @@ class UPDExcelDocumentCreate(BaseExcelDocumentCreate):
         offset = 0
         cell_itmes_number = None
 
-        self.fill_doc(document, sheet, offset, cell_itmes_number)
+        fill_dict = self.fill_doc(document, sheet, offset, cell_itmes_number)
+        cell_itmes_number = fill_dict["cell_itmes_number"]
+        offset = fill_dict["offset"]
 
         #!!Костыль для проверки на одинаковый ИНН продавца и грузоотправителя
         cell_consignor = "AP9"
