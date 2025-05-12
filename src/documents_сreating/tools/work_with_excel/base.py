@@ -22,6 +22,84 @@ class BaseExcelDocumentCreate(ABC):
         self.document_dict: dict = document_dict
         self.template_path: str = template_path
 
+    def inn_or_kpp(self, text: str) -> str:
+
+        if ("inn_" in text or 
+            "_inn" in text):
+            return "inn"
+        if ("kpp_" in text or
+            "_kpp" in text):
+            return "kpp"
+        return ""
+
+    def fill_doc(self, document: BaseModel, sheet: Worksheet, offset: int, cell_itmes_number: int) -> None:
+        """
+        Заполняет лист excel данными из document сопоставляя по self.document_dict
+        """
+
+        if "cell_itmes_number" in self.document_dict:
+            cell_itmes_number = self.document_dict["cell_itmes_number"] #Номер строки с которой начинаются строки товаров
+            offset = self.add_document_itmes(sheet, document.items_docs, cell_itmes_number) #Количество строк товаров
+
+        if "Images" in self.document_dict:
+
+            organization = Organization.objects.filter(inn=document.seller_inn).first()
+
+            #Добавление печати и подписи
+            if organization:
+                for image in self.document_dict["Images"]:
+                    if hasattr(organization, image["type"]) and getattr(organization, image["type"]):
+                        self.add_image(sheet, getattr(organization, image["type"]).name, image["width"], image["height"], self.get_cell_ref(image["cell"], cell_itmes_number, offset))
+
+                #!!Необходимо добавить заполнение КПП если ИНН отсутствует
+        if "concatenation" in self.document_dict:
+            for key, cell_ref in self.document_dict["concatenation"].items():
+                if hasattr(document, key) and getattr(document, key):
+                    cell = self.get_cell_ref(cell_ref, cell_itmes_number, offset)
+                    if sheet[cell].value != None:
+                        sheet[cell].value += f", {getattr(document, key)}"
+                        value = sheet[cell].value
+                        self.row_height_from_content(sheet, value, cell)
+                    else:
+                        sheet[cell] = str(getattr(document, key))
+                        value = sheet[cell].value
+                        self.row_height_from_content(sheet, value, cell)
+
+        #!!Необходимо добавить заполнение КПП если ИНН отсутствует
+        if "raw_data" in self.document_dict:
+            for key, cell_ref in self.document_dict["raw_data"].items():
+                if hasattr(document, key) and getattr(document, key):
+                    value = str(getattr(document, key))
+                    inn_kpp = self.inn_or_kpp(value)
+                    if inn_kpp == "inn":
+                        value = "ИНН " + value
+                    elif inn_kpp == "kpp":
+                        value "КПП"
+                    cell = self.get_cell_ref(cell_ref, cell_itmes_number, offset)
+                    sheet[cell] = value
+                    self.row_height_from_content(sheet, value, cell)
+
+        #!!Изменить склонения месяцов дат
+        if "date" in self.document_dict:
+            if "day" in self.document_dict["date"]:
+                for key, cell_ref in self.document_dict["date"]["day"].items():
+                    if hasattr(document, key) and getattr(document, key):
+                        sheet[self.get_cell_ref(cell_ref, cell_itmes_number, offset)] = str(getattr(document, key).day)
+            if "month" in self.document_dict["date"]:
+                for key, cell_ref in self.document_dict["date"]["month"].items():
+                    if hasattr(document, key) and getattr(document, key):
+                        sheet[self.get_cell_ref(cell_ref, cell_itmes_number, offset)] = str(getattr(document, key).strftime('%B'))
+
+            if "year" in self.document_dict["date"]:
+                for key, cell_ref in self.document_dict["date"]["year"].items():
+                    if hasattr(document, key) and getattr(document, key):
+                        sheet[self.get_cell_ref(cell_ref, cell_itmes_number, offset)] = str(getattr(document, key).year)
+
+            if "fromat" in self.document_dict["date"]:
+                for key, cell_ref in self.document_dict["date"]["fromat"].items():
+                    if hasattr(document, key) and getattr(document, key):
+                        sheet[self.get_cell_ref(cell_ref, cell_itmes_number, offset)] = f'"{getattr(document, key).day}" {getattr(document, key).strftime("%B %Y г.")}'
+
     @abstractmethod
     def create_excel_document(self, document: BaseModel) -> BinaryIO:
         """
