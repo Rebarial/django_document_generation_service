@@ -43,6 +43,14 @@ invoice_for_payment_dict = {
         "organization_bank_place_of_registration": ("A", 8),
         "organization_correspondent_account": ("A", 8),
         "organization_bik": ("A", 8),
+
+        "customer_address": ("AY", 8),
+        "customer_inn": ("AY", 8),
+        "customer_main_state_number": ("AY", 8),
+        "customer_bank_name": ("AY", 8),
+        "customer_bank_place_of_registration": ("AY", 8),
+        "customer_correspondent_account": ("AY", 8),
+        "customer_bik": ("A", 8),
     },
     "document_name": {
         "cell": ("A", 10),
