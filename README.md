@@ -5,6 +5,13 @@
  - админка http://127.0.0.1:8000/admin/
  - APIView для документов UPD http://127.0.0.1:8000/api/upd/
  - реализовано создание UPD документа в pdf формате http://127.0.0.1:8000/api/upd/{id} (extra actions) или http://127.0.0.1:8000/api/upd/{id}/libre
+
+## Сервер
+ - админка http://147.45.110.79:8000/admin/ (более удобный способ заполнения документов логин: admin; пароль: admin) 
+ - пример упд: http://147.45.110.79:8000/api/upd/1/ (extra actions для распечатки)
+ - пример счета на оплату: http://147.45.110.79:8000/api/invoiceforpayment/7/ (extra actions для распечатки)
+
+
 ## Установка
 Необходим docker и docker-copose
 
