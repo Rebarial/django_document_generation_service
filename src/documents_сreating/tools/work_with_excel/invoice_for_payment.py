@@ -3,11 +3,7 @@ from documents_сreating.models.base import BaseModel
 from openpyxl import load_workbook
 from ..layout_parameters_dictionary.invoice_for_payment import invoice_for_payment_dict
 from io import BytesIO
-from documents_сreating.models.organization import Organization
-import locale
 from typing import Callable
-
-locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 
 class InvoiceForPaymentExcelDocumentCreate(BaseExcelDocumentCreate):
 
@@ -21,17 +17,41 @@ class InvoiceForPaymentExcelDocumentCreate(BaseExcelDocumentCreate):
 
         workbook = load_workbook(self.template_path)
         sheet = workbook.active
-        offset = 0
-        cell_itmes_number = None
+        offset = []
 
-        fill_dict = self.fill_doc(document, sheet, offset, cell_itmes_number)
-        cell_itmes_number = fill_dict["cell_itmes_number"]
-        offset = fill_dict["offset"]
-        print(f'cell number is : {cell_itmes_number}')
+        if "document_name" in self.document_dict:
+
+            number = self.document_dict["document_name"]["number"]
+            if hasattr(document, number) and getattr(document, number):
+                sheet[self.get_cell_ref(self.document_dict["document_name"]["cell"], offset)].value += getattr(document, number)
+
+            date = self.document_dict["document_name"]["date"]
+            if hasattr(document, date) and getattr(document, date):
+                sheet[self.get_cell_ref(self.document_dict["document_name"]["cell"], offset)].value += f' от {getattr(document, date).day}" {getattr(document, date).strftime("%B %Y г.")}'
+
+            
+
+        invoice_organization_info_dict_value = []
+        for item in self.document_dict["invoice_organization_info_value"]:
+            invoice_organization_info_dict_value.append({"info": str(getattr(document, item))})
+
+        offset.append({
+                "cell_itmes_number": self.document_dict["invoice_organization_info_cell_number"],
+                "offset": self.add_document_itmes(
+                    sheet=sheet,
+                    items=invoice_organization_info_dict_value,
+                    cell_itmes_number=self.document_dict["invoice_organization_info_cell_number"], 
+                    items_name="invoice_organization_info_items",
+                    height_orientation_name = "info",
+                    height_orientation_column = "A",
+                )
+        })
+
+        fill_dict = self.fill_doc(document, sheet, offset)
 
         #Добавляем разрывы в зависимости от занимаемого места
         if "break_points" in self.document_dict:
-            self.add_rows_break(sheet, self.document_dict["break_points"], offset, cell_itmes_number)
+            self.add_rows_break(sheet, self.document_dict["break_points"], offset)
 
         #Для корректного отображения с toPDF_libre
         sheet.page_setup.scale = 99

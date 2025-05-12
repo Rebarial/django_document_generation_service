@@ -13,6 +13,9 @@ from documents_сreating.models.organization import Organization
 from typing import BinaryIO
 import math
 import subprocess
+import locale
+
+locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 
 class BaseExcelDocumentCreate(ABC):
     """
@@ -24,7 +27,6 @@ class BaseExcelDocumentCreate(ABC):
         self.template_path: str = template_path
 
     def inn_or_kpp(self, text: str) -> str:
-
         if ("inn_" in text or 
             "_inn" in text):
             return "inn"
@@ -33,18 +35,24 @@ class BaseExcelDocumentCreate(ABC):
             return "kpp"
         return ""
 
-    def fill_doc(self, document: BaseModel, sheet: Worksheet, offset: int, cell_itmes_number: int) -> dict:
+    def fill_doc(self, document: BaseModel, sheet: Worksheet, offset: list) -> None:
         """
         Заполняет лист excel данными из document сопоставляя по self.document_dict
         """
 
-        cell_itmes_number = cell_itmes_number
         offset = offset
 
         if "cell_itmes_number" in self.document_dict:
             cell_itmes_number = self.document_dict["cell_itmes_number"] #Номер строки с которой начинаются строки товаров
-            print(f'cell number is : {cell_itmes_number}')
-            offset = self.add_document_itmes(sheet, document.items_docs, cell_itmes_number) #Количество строк товаров
+            sum_offset = 0
+            for item in offset:
+                sum_offset += item["offset"]
+
+            offset_local = self.add_document_itmes(sheet, list(document.items_docs.all().values()), cell_itmes_number+sum_offset, "items") #Количество строк товаров
+            offset.append({
+                "cell_itmes_number": cell_itmes_number,
+                "offset": offset_local
+            })
 
         if "Images" in self.document_dict:
 
@@ -54,13 +62,13 @@ class BaseExcelDocumentCreate(ABC):
             if organization:
                 for image in self.document_dict["Images"]:
                     if hasattr(organization, image["type"]) and getattr(organization, image["type"]):
-                        self.add_image(sheet, getattr(organization, image["type"]).name, image["width"], image["height"], self.get_cell_ref(image["cell"], cell_itmes_number, offset))
+                        self.add_image(sheet, getattr(organization, image["type"]).name, image["width"], image["height"], self.get_cell_ref(image["cell"], offset))
 
                 #!!Необходимо добавить заполнение КПП если ИНН отсутствует
         if "concatenation" in self.document_dict:
             for key, cell_ref in self.document_dict["concatenation"].items():
                 if hasattr(document, key) and getattr(document, key):
-                    cell = self.get_cell_ref(cell_ref, cell_itmes_number, offset)
+                    cell = self.get_cell_ref(cell_ref, offset)
                     if sheet[cell].value != None:
                         sheet[cell].value += f", {getattr(document, key)}"
                         value = sheet[cell].value
@@ -82,11 +90,11 @@ class BaseExcelDocumentCreate(ABC):
                         value = "КПП" + value
                     if isinstance(cell_ref, list):
                         for cell_item in cell_ref:
-                            cell = self.get_cell_ref(cell_item, cell_itmes_number, offset)
+                            cell = self.get_cell_ref(cell_item, offset)
                             sheet[cell] = value
                             self.row_height_from_content(sheet, value, cell)
                     else:
-                        cell = self.get_cell_ref(cell_ref, cell_itmes_number, offset)
+                        cell = self.get_cell_ref(cell_ref, offset)
                         sheet[cell] = value
                         self.row_height_from_content(sheet, value, cell)
 
@@ -95,26 +103,22 @@ class BaseExcelDocumentCreate(ABC):
             if "day" in self.document_dict["date"]:
                 for key, cell_ref in self.document_dict["date"]["day"].items():
                     if hasattr(document, key) and getattr(document, key):
-                        sheet[self.get_cell_ref(cell_ref, cell_itmes_number, offset)] = str(getattr(document, key).day)
+                        sheet[self.get_cell_ref(cell_ref, offset)] = str(getattr(document, key).day)
             if "month" in self.document_dict["date"]:
                 for key, cell_ref in self.document_dict["date"]["month"].items():
                     if hasattr(document, key) and getattr(document, key):
-                        sheet[self.get_cell_ref(cell_ref, cell_itmes_number, offset)] = str(getattr(document, key).strftime('%B'))
+                        sheet[self.get_cell_ref(cell_ref, offset)] = str(getattr(document, key).strftime('%B'))
 
             if "year" in self.document_dict["date"]:
                 for key, cell_ref in self.document_dict["date"]["year"].items():
                     if hasattr(document, key) and getattr(document, key):
-                        sheet[self.get_cell_ref(cell_ref, cell_itmes_number, offset)] = str(getattr(document, key).year)
+                        sheet[self.get_cell_ref(cell_ref, offset)] = str(getattr(document, key).year)
 
             if "fromat" in self.document_dict["date"]:
                 for key, cell_ref in self.document_dict["date"]["fromat"].items():
                     if hasattr(document, key) and getattr(document, key):
-                        sheet[self.get_cell_ref(cell_ref, cell_itmes_number, offset)] = f'"{getattr(document, key).day}" {getattr(document, key).strftime("%B %Y г.")}'
+                        sheet[self.get_cell_ref(cell_ref, offset)] = f'"{getattr(document, key).day}" {getattr(document, key).strftime("%B %Y г.")}'
 
-        return {
-            "cell_itmes_number": cell_itmes_number,
-            "offset": offset,
-        }
 
     @abstractmethod
     def create_excel_document(self, document: BaseModel) -> BinaryIO:
@@ -124,13 +128,16 @@ class BaseExcelDocumentCreate(ABC):
         """
         pass
 
-    def get_cell_ref(self, key: tuple[str, int], cell_itmes_number: int, offset: int) -> str:
+    def get_cell_ref(self, key: tuple[str, int], offset: dict) -> str:
         """
         Возвращает строковое представление ссылки excel на основе кортежа, учитывая смещение при добавлении items
         """
         num = key[1]
-        if cell_itmes_number and num > cell_itmes_number: 
-            num += offset
+        for item in offset:
+            cell_itmes_number = item["cell_itmes_number"]
+            offset = item["offset"]  
+            if cell_itmes_number and num > cell_itmes_number: 
+                num += offset
         return f"{key[0]}{num}"
 
     def find_nearest_lesser_or_equal(self, numbers: tuple, target: int) -> int:
@@ -142,14 +149,19 @@ class BaseExcelDocumentCreate(ABC):
         
         return max(lesser_or_equal_numbers)
 
-    def add_rows_break(self, sheet: Worksheet, break_points: list, offset: int, items_row: int) -> None:
+    def add_rows_break(self, sheet: Worksheet, break_points: list, offset: list) -> None:
 
-        break_points = [point if point <= items_row else point + offset for point in break_points]
+        offset_sum = 0
+        for item in offset:
+            items_row = item["cell_itmes_number"] 
+            offset_local = item["offset"]
+            offset_sum += offset_local
+            break_points = [point if point <= items_row else point + offset_local for point in break_points]
 
         last_row = sheet.max_row + 2 # +2 строки для печати
         i = 1
         start_items_row = items_row - 2 # -2: Добавил шапку и 0 строку
-        end_items_row = items_row + offset + 1 # + 1: Добавил колонку итогов
+        end_items_row = items_row + offset_sum + 1 # + 1: Добавил колонку итогов
         row_height_sum = 0
         start_id = 0
         max_height_on_list = 530 #530 - размер листа
@@ -206,7 +218,7 @@ class BaseExcelDocumentCreate(ABC):
         img.height = height
         sheet.add_image(img, cell)
 
-    def add_document_itmes(self, sheet: Worksheet, items: BaseModel, cell_itmes_number: int) -> int:
+    def add_document_itmes(self, sheet: Worksheet, items: dict, cell_itmes_number: int, items_name: str, height_orientation_name: str = 'name', height_orientation_column: str = 'R') -> int:
         """
         Вставляет строки в таблицу excel и возвращает смещение
         """
@@ -214,20 +226,20 @@ class BaseExcelDocumentCreate(ABC):
         merge_items = []
         merge_items_name = None
         offset = 0
+
         #Заполняем список координат объедененных ячеек после строки с таблицы
         for mrg in sheet.merged_cells.ranges:
             start_col, start_row, end_col, end_row = range_boundaries(str(mrg))  # получаем границы объединённой области
-            if start_row >= cell_itmes_number: 
+            if start_row > cell_itmes_number: 
                 merge_areas.append(mrg)
-            elif start_row >= cell_itmes_number-1 and end_row <= cell_itmes_number-1:
+            elif start_row >= cell_itmes_number and end_row <= cell_itmes_number:
                 merge_items.append(mrg)
-                if start_col == 18:
+                if start_col == column_index_from_string(height_orientation_column):
                     merge_items_name = mrg
                 
-
         #Сохраняем высоту строк
         row_heights = {}
-        for row in range(cell_itmes_number, sheet.max_row):
+        for row in range(cell_itmes_number+1, sheet.max_row):
             row_heights[row] = sheet.row_dimensions[row].height
 
         for merge_range in merge_areas:
@@ -243,12 +255,12 @@ class BaseExcelDocumentCreate(ABC):
                 'alignment': cell.alignment.copy()
          })
         
-        offset = items.count()
-
+        offset = len(items)-1#.count()
         #Добавляем строки и заполняем
-        for i, item in enumerate(items.all()):
+        for i, item in enumerate(items):
             number_of_row = cell_itmes_number + i
-            sheet.insert_rows(number_of_row)
+            if i:
+                sheet.insert_rows(number_of_row)
 
             for col_idx, style in enumerate(styles_source):
                 target_cell = sheet.cell(row=number_of_row, column=col_idx + 1)
@@ -257,17 +269,21 @@ class BaseExcelDocumentCreate(ABC):
                 target_cell.border = style['border']
                 target_cell.alignment = style['alignment']
 
-            if "items" in self.document_dict:
-                for key, cell_ref in self.document_dict["items"].items():
-                    if hasattr(item, key) and getattr(item, key):
-                        value = str(getattr(item, key))
+            if items_name in self.document_dict:
+                for key, cell_ref in self.document_dict[items_name].items():
+                    if key in item and item[key]:
+                        value = str(item[key])
                         sheet[f'{cell_ref}{number_of_row}'] = value
 
-                    if key == 'name':
-                        if merge_items_name:
-                            coords = range_boundaries(str(merge_items_name))
-                            column_width = int(coords[2]) - int(coords[0])
-                            sheet.row_dimensions[cell_itmes_number + i].height = self.calculate_row_height(value, target_cell.font, column_width)
+                        if key == height_orientation_name:
+                            
+                            if merge_items_name:
+                                print(height_orientation_name)
+                                coords = range_boundaries(str(merge_items_name))
+                                column_width = int(coords[2]) - int(coords[0])
+                                new_height = self.calculate_row_height(value, target_cell.font, column_width)
+                                if new_height > sheet.row_dimensions[cell_itmes_number + i].height:
+                                    sheet.row_dimensions[cell_itmes_number + i].height = self.calculate_row_height(value, target_cell.font, column_width)
 
             for area in merge_items:
                 coords = range_boundaries(str(area))
@@ -276,6 +292,7 @@ class BaseExcelDocumentCreate(ABC):
 
         #Возвращаем высоту строк после добавления
         for row, height in row_heights.items():
+            print(row+offset)
             sheet.row_dimensions[row + offset].height = height
 
         #Соединяем зоны после добавления строк
