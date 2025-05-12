@@ -282,8 +282,7 @@ class BaseExcelDocumentCreate(ABC):
                                 coords = range_boundaries(str(merge_items_name))
                                 column_width = int(coords[2]) - int(coords[0])
                                 new_height = self.calculate_row_height(value, target_cell.font, column_width)
-                                if new_height > sheet.row_dimensions[cell_itmes_number + i].height:
-                                    sheet.row_dimensions[cell_itmes_number + i].height = self.calculate_row_height(value, target_cell.font, column_width)
+                                sheet.row_dimensions[cell_itmes_number + i].height = self.calculate_row_height(value, target_cell.font, column_width)
 
             for area in merge_items:
                 coords = range_boundaries(str(area))
