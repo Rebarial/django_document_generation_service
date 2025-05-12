@@ -8,9 +8,7 @@ invoice_for_payment_dict = {
         "last_column": "FI",
         },
     "raw_data": {
-        "organization_name" : ("A", 1),
-        "organization_name" : ("A", 5),
-        "organization_name" : ("A", 7),
+        "organization_name" : [("A", 1), ("A", 5), ("A", 7)],
         "customer_name" : ("AY", 7),
         "purpose_of_payment" : ("A", 15),
         "organization_director_name" : ("AI", 20),

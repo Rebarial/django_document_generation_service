@@ -32,13 +32,17 @@ class BaseExcelDocumentCreate(ABC):
             return "kpp"
         return ""
 
-    def fill_doc(self, document: BaseModel, sheet: Worksheet, offset: int, cell_itmes_number: int) -> None:
+    def fill_doc(self, document: BaseModel, sheet: Worksheet, offset: int, cell_itmes_number: int) -> dict:
         """
         Заполняет лист excel данными из document сопоставляя по self.document_dict
         """
 
+        cell_itmes_number = cell_itmes_number
+        offset = offset
+
         if "cell_itmes_number" in self.document_dict:
             cell_itmes_number = self.document_dict["cell_itmes_number"] #Номер строки с которой начинаются строки товаров
+            print(f'cell number is : {cell_itmes_number}')
             offset = self.add_document_itmes(sheet, document.items_docs, cell_itmes_number) #Количество строк товаров
 
         if "Images" in self.document_dict:
@@ -74,10 +78,16 @@ class BaseExcelDocumentCreate(ABC):
                     if inn_kpp == "inn":
                         value = "ИНН " + value
                     elif inn_kpp == "kpp":
-                        value "КПП"
-                    cell = self.get_cell_ref(cell_ref, cell_itmes_number, offset)
-                    sheet[cell] = value
-                    self.row_height_from_content(sheet, value, cell)
+                        value = "КПП" + value
+                    if isinstance(cell_ref, list):
+                        for cell_item in cell_ref:
+                            cell = self.get_cell_ref(cell_item, cell_itmes_number, offset)
+                            sheet[cell] = value
+                            self.row_height_from_content(sheet, value, cell)
+                    else:
+                        cell = self.get_cell_ref(cell_ref, cell_itmes_number, offset)
+                        sheet[cell] = value
+                        self.row_height_from_content(sheet, value, cell)
 
         #!!Изменить склонения месяцов дат
         if "date" in self.document_dict:
@@ -99,6 +109,11 @@ class BaseExcelDocumentCreate(ABC):
                 for key, cell_ref in self.document_dict["date"]["fromat"].items():
                     if hasattr(document, key) and getattr(document, key):
                         sheet[self.get_cell_ref(cell_ref, cell_itmes_number, offset)] = f'"{getattr(document, key).day}" {getattr(document, key).strftime("%B %Y г.")}'
+
+        return {
+            "cell_itmes_number": cell_itmes_number,
+            "offset": offset,
+        }
 
     @abstractmethod
     def create_excel_document(self, document: BaseModel) -> BinaryIO:

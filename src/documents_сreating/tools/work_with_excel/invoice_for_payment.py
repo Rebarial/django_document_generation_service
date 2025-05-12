@@ -24,8 +24,11 @@ class InvoiceForPaymentExcelDocumentCreate(BaseExcelDocumentCreate):
         offset = 0
         cell_itmes_number = None
 
-        self.fill_doc(document, sheet, offset, cell_itmes_number)
-    
+        fill_dict = self.fill_doc(document, sheet, offset, cell_itmes_number)
+        cell_itmes_number = fill_dict["cell_itmes_number"]
+        offset = fill_dict["offset"]
+        print(f'cell number is : {cell_itmes_number}')
+
         #Добавляем разрывы в зависимости от занимаемого места
         if "break_points" in self.document_dict:
             self.add_rows_break(sheet, self.document_dict["break_points"], offset, cell_itmes_number)
