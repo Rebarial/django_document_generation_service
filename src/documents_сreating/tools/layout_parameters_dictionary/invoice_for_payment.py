@@ -48,7 +48,7 @@ invoice_for_payment_dict = {
         "customer_inn": ("AY", 8),
         "customer_main_state_number": ("AY", 8),
         "customer_bank_name": ("AY", 8),
-        "customer_bank_place_of_registration": ("AY", 8),
+        "customer_place_of_registration": ("AY", 8),
         "customer_correspondent_account": ("AY", 8),
         "customer_bik": ("A", 8),
     },

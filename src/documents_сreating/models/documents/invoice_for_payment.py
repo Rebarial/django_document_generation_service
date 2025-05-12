@@ -55,7 +55,7 @@ class DocumentInvoiceForPayment(BaseDocument):
     #Банковские реквизиты покупателя
     customer_bik = models.CharField(max_length=9, blank=True, null=True, verbose_name='Покупатель БИК')
     customer_bank_name = models.CharField(max_length=100, blank=True, null=True, verbose_name='Покупатель Наименование банка')
-    customer_bank_place_of_registration = models.CharField(max_length=100, blank=True, null=True, verbose_name='Покупатель Место нахождения')
+    customer_place_of_registration = models.CharField(max_length=100, blank=True, null=True, verbose_name='Покупатель Место нахождения')
     customer_correspondent_account = models.CharField(max_length=20, blank=True, null=True, verbose_name='Покупатель Корреспондентский счет')
     customer_current_account = models.CharField(max_length=20, blank=True, null=True, verbose_name='Покупатель Текущий счет')
 
