@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h2>Создание счета на оплату</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Основная информация -->
+        <div class="card mb-4">
+            <div class="card-header">Основные данные</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.invoice_for_payment_number.label_tag }}
+                        {{ form.invoice_for_payment_number }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.invoice_for_payment_data.label_tag }}
+                        {{ form.invoice_for_payment_data }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Информация об организации -->
+        <div class="card mb-4">
+            <div class="card-header">Реквизиты организации</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.organization_name.label_tag }}
+                        {{ form.organization_name }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.organization_inn.label_tag }}
+                        {{ form.organization_inn }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.organization_kpp.label_tag }}
+                        {{ form.organization_kpp }}
+                    </div>
+                </div>
+                <!-- Добавьте остальные поля организации -->
+            </div>
+        </div>
+
+        <!-- Таблица товаров -->
+        <div class="card mb-4">
+            <div class="card-header">Товары/услуги</div>
+            <div class="card-body">
+                {{ formset.management_form }}
+                <table class="table" id="items-table">
+                    <thead>
+                        <tr>
+                            <th>Наименование</th>
+                            <th>Кол-во</th>
+                            <th>Ед. изм.</th>
+                            <th>Цена</th>
+                            <th>Сумма</th>
+                            <th>Удалить</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for form in formset %}
+                        <tr class="item-form">
+                            <td>{{ form.name }}</td>
+                            <td>{{ form.quantity }}</td>
+                            <td>{{ form.unit }}</td>
+                            <td>{{ form.price }}</td>
+                            <td>{{ form.sum }}</td>
+                            <td>{{ form.DELETE }}</td>
+                            {{ form.id }}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-secondary" id="add-item">Добавить строку</button>
+            </div>
+        </div>
+
+        <!-- Кнопки действий -->
+        <div class="form-group">
+            <button type="submit" name="save" class="btn btn-primary">Сохранить</button>
+            <button type="submit" name="save_pdf" class="btn btn-info">Сохранить и скачать PDF</button>
+            <button type="submit" name="save_excel" class="btn btn-success">Сохранить и скачать Excel</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Добавление новой строки товара
+    document.getElementById('add-item').addEventListener('click', function() {
+        const formCount = document.getElementById('id_items-TOTAL_FORMS');
+        const table = document.getElementById('items-table').getElementsByTagName('tbody')[0];
+        const newRow = table.rows[0].cloneNode(true);
+        
+        // Обновляем индексы в новой строке
+        Array.from(newRow.querySelectorAll('input, select')).forEach(function(input) {
+            const name = input.name.replace(/-\d+-/, '-' + formCount.value + '-');
+            const id = input.id.replace(/-\d+-/, '-' + formCount.value + '-');
+            input.name = name;
+            input.id = id;
+            input.value = '';
+        });
+        
+        table.appendChild(newRow);
+        formCount.value = parseInt(formCount.value) + 1;
+    });
+    
+    // Автоматический расчет суммы
+    document.getElementById('items-table').addEventListener('change', function(e) {
+        if (e.target.classList.contains('quantity') || e.target.classList.contains('price')) {
+            const row = e.target.closest('tr');
+            const quantity = parseFloat(row.querySelector('.quantity input').value) || 0;
+            const price = parseFloat(row.querySelector('.price input').value) || 0;
+            const sum = quantity * price;
+            row.querySelector('.sum input').value = sum.toFixed(2);
+        }
+    });
+});
+</script>
+{% endblock %}
