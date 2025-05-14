@@ -1,7 +1,11 @@
 from django.db import models
 from .base import BaseModel
+from django.conf import settings
 
 class Organization(BaseModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Пользователь', 
+                             help_text='Выбор пользователя')
+
     name = models.CharField(max_length=255, blank=True, null=True, verbose_name='Наименование')
     full_name = models.CharField(max_length=500, blank=True, null=True, verbose_name='Полное наименование')
     inn = models.CharField(max_length=12, verbose_name='ИНН')

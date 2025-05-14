@@ -35,28 +35,31 @@ class BaseExcelDocumentCreate(ABC):
             return "kpp"
         return ""
 
-    def fill_doc(self, document: BaseModel, sheet: Worksheet, offset: list) -> None:
+    def fill_doc(self, document: BaseModel, sheet: Worksheet, offset: list, inn_field: str) -> None:
         """
         Заполняет лист excel данными из document сопоставляя по self.document_dict
         """
 
         offset = offset
 
-        if "cell_itmes_number" in self.document_dict:
-            cell_itmes_number = self.document_dict["cell_itmes_number"] #Номер строки с которой начинаются строки товаров
-            sum_offset = 0
-            for item in offset:
-                sum_offset += item["offset"]
+        if "Defoult_items" in self.document_dict:
+            
+            for item_data in self.document_dict["Defoult_items"]:
+                cell_itmes_number = item_data["cell_itmes_number"] #Номер строки с которой начинаются строки товаров
+                sum_offset = 0
+                for item in offset:
+                    if item["cell_itmes_number"] < cell_itmes_number:
+                        sum_offset += item["offset"]
 
-            offset_local = self.add_document_itmes(sheet, list(document.items_docs.all().values()), cell_itmes_number+sum_offset, "items") #Количество строк товаров
-            offset.append({
-                "cell_itmes_number": cell_itmes_number,
-                "offset": offset_local
-            })
+                offset_local = self.add_document_itmes(sheet, list(getattr(document,item_data["items_model_name"]).all().values()), cell_itmes_number+sum_offset, item_data["items_content"]) #Количество строк товаров
+                offset.append({
+                    "cell_itmes_number": cell_itmes_number,
+                    "offset": offset_local
+                })
 
         if "Images" in self.document_dict:
 
-            organization = Organization.objects.filter(inn=document.seller_inn).first()
+            organization = Organization.objects.filter(inn=getattr(document, inn_field)).first()
 
             #Добавление печати и подписи
             if organization:
@@ -65,8 +68,8 @@ class BaseExcelDocumentCreate(ABC):
                         self.add_image(sheet, getattr(organization, image["type"]).name, image["width"], image["height"], self.get_cell_ref(image["cell"], offset))
 
                 #!!Необходимо добавить заполнение КПП если ИНН отсутствует
-        if "concatenation" in self.document_dict:
-            for key, cell_ref in self.document_dict["concatenation"].items():
+        if "Concatenation" in self.document_dict:
+            for key, cell_ref in self.document_dict["Concatenation"].items():
                 if hasattr(document, key) and getattr(document, key):
                     cell = self.get_cell_ref(cell_ref, offset)
                     if sheet[cell].value != None:
@@ -79,8 +82,8 @@ class BaseExcelDocumentCreate(ABC):
                         self.row_height_from_content(sheet, value, cell)
 
         #!!Необходимо добавить заполнение КПП если ИНН отсутствует
-        if "raw_data" in self.document_dict:
-            for key, cell_ref in self.document_dict["raw_data"].items():
+        if "Raw_data" in self.document_dict:
+            for key, cell_ref in self.document_dict["Raw_data"].items():
                 if hasattr(document, key) and getattr(document, key):
                     value = str(getattr(document, key))
                     inn_kpp = self.inn_or_kpp(value)
@@ -99,23 +102,23 @@ class BaseExcelDocumentCreate(ABC):
                         self.row_height_from_content(sheet, value, cell)
 
         #!!Изменить склонения месяцов дат
-        if "date" in self.document_dict:
-            if "day" in self.document_dict["date"]:
-                for key, cell_ref in self.document_dict["date"]["day"].items():
+        if "Date" in self.document_dict:
+            if "day" in self.document_dict["Date"]:
+                for key, cell_ref in self.document_dict["Date"]["day"].items():
                     if hasattr(document, key) and getattr(document, key):
                         sheet[self.get_cell_ref(cell_ref, offset)] = str(getattr(document, key).day)
-            if "month" in self.document_dict["date"]:
-                for key, cell_ref in self.document_dict["date"]["month"].items():
+            if "month" in self.document_dict["Date"]:
+                for key, cell_ref in self.document_dict["Date"]["month"].items():
                     if hasattr(document, key) and getattr(document, key):
                         sheet[self.get_cell_ref(cell_ref, offset)] = str(getattr(document, key).strftime('%B'))
 
-            if "year" in self.document_dict["date"]:
-                for key, cell_ref in self.document_dict["date"]["year"].items():
+            if "year" in self.document_dict["Date"]:
+                for key, cell_ref in self.document_dict["Date"]["year"].items():
                     if hasattr(document, key) and getattr(document, key):
                         sheet[self.get_cell_ref(cell_ref, offset)] = str(getattr(document, key).year)
 
-            if "fromat" in self.document_dict["date"]:
-                for key, cell_ref in self.document_dict["date"]["fromat"].items():
+            if "fromat" in self.document_dict["Date"]:
+                for key, cell_ref in self.document_dict["Date"]["fromat"].items():
                     if hasattr(document, key) and getattr(document, key):
                         sheet[self.get_cell_ref(cell_ref, offset)] = f'"{getattr(document, key).day}" {getattr(document, key).strftime("%B %Y г.")}'
 
@@ -218,7 +221,7 @@ class BaseExcelDocumentCreate(ABC):
         img.height = height
         sheet.add_image(img, cell)
 
-    def add_document_itmes(self, sheet: Worksheet, items: dict, cell_itmes_number: int, items_name: str, height_orientation_name: str = 'name', height_orientation_column: str = 'R') -> int:
+    def add_document_itmes(self, sheet: Worksheet, items: dict, cell_itmes_number: int, items_content: dict, height_orientation_name: str = 'name', height_orientation_column: str = 'R') -> int:
         """
         Вставляет строки в таблицу excel и возвращает смещение
         """
@@ -226,7 +229,6 @@ class BaseExcelDocumentCreate(ABC):
         merge_items = []
         merge_items_name = None
         offset = 0
-
         #Заполняем список координат объедененных ячеек после строки с таблицы
         for mrg in sheet.merged_cells.ranges:
             start_col, start_row, end_col, end_row = range_boundaries(str(mrg))  # получаем границы объединённой области
@@ -269,20 +271,18 @@ class BaseExcelDocumentCreate(ABC):
                 target_cell.border = style['border']
                 target_cell.alignment = style['alignment']
 
-            if items_name in self.document_dict:
-                for key, cell_ref in self.document_dict[items_name].items():
-                    if key in item and item[key]:
-                        value = str(item[key])
-                        sheet[f'{cell_ref}{number_of_row}'] = value
+            for key, cell_ref in items_content.items():
+                if key in item and item[key]:
+                    value = str(item[key])
+                    sheet[f'{cell_ref}{number_of_row}'] = value
 
-                        if key == height_orientation_name:
-                            
-                            if merge_items_name:
-                                print(height_orientation_name)
-                                coords = range_boundaries(str(merge_items_name))
-                                column_width = int(coords[2]) - int(coords[0])
-                                new_height = self.calculate_row_height(value, target_cell.font, column_width)
-                                sheet.row_dimensions[cell_itmes_number + i].height = self.calculate_row_height(value, target_cell.font, column_width)
+                    if key == height_orientation_name:
+                        
+                        if merge_items_name:
+                            coords = range_boundaries(str(merge_items_name))
+                            column_width = int(coords[2]) - int(coords[0])
+                            new_height = self.calculate_row_height(value, target_cell.font, column_width)
+                            sheet.row_dimensions[cell_itmes_number + i].height = self.calculate_row_height(value, target_cell.font, column_width)
 
             for area in merge_items:
                 coords = range_boundaries(str(area))
@@ -291,7 +291,6 @@ class BaseExcelDocumentCreate(ABC):
 
         #Возвращаем высоту строк после добавления
         for row, height in row_heights.items():
-            print(row+offset)
             sheet.row_dimensions[row + offset].height = height
 
         #Соединяем зоны после добавления строк
@@ -384,61 +383,3 @@ class BaseExcelDocumentCreate(ABC):
                     return self.read_and_return_file(out_file)
             except Exception as err:
                 print(f"Ошибка при преобразовании: {err}")
-
-    """
-    def toPDF_win32(self, file_name: str):
-        file_path = 'C:\\Users\\reber\\PycharmProjects\\UPD\\src\\' + file_name
-        pythoncom.CoInitialize()
-        
-        excel = None
-        workbook = None
-        
-        try:
-            # Открываем Excel
-            excel = client.Dispatch("Excel.Application")
-            excel.Visible = False  # Скрываем окно Excel
-
-            # Открываем файл
-            workbook = excel.Workbooks.Open(file_path)
-            
-            worksheet = workbook.Worksheets[0]
-
-            #worksheet.HPageBreaks.Add(Before=worksheet.Rows(21)) Разрывы
-
-            # Конвертируем в PDF
-            out_file = file_path.replace('.xlsx', '.pdf')
-            worksheet.ExportAsFixedFormat(0, out_file)
-
-            return self.read_and_return_file(out_file)
-            
-        except Exception as e:
-            print(f"Ошибка при конвертации: {e}")
-            raise
-            
-        finally:
-            if workbook:
-                workbook.Close(SaveChanges=False)
-            if excel:
-                excel.Quit()
-            pythoncom.CoUninitialize()
-
-    def toPDF_spire(self, file_path: str):
-        
-        workbook = Workbook()
-        workbook.LoadFromFile(file_path)
-        for sheet in workbook.Worksheets:
-            pageSetup = sheet.PageSetup
-            pageSetup.TopMargin = 0.3
-            pageSetup.BottomMargin = 0.3
-            pageSetup.LeftMargin = 0.3
-            pageSetup.RightMargin = 0.3
-
-        workbook.ConverterSetting.SheetFitToPage = True
-        
-        out_file = file_path.replace('.xlsx', '.pdf')
-
-        workbook.SaveToFile(out_file, FileFormat.PDF)
-        workbook.Dispose()
-
-        self.read_and_return_file(out_file)
-    """        

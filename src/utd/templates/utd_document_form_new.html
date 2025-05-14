@@ -1,0 +1,756 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>
+    Создать новый упд | RFTK
+  </title>
+    <link rel="icon" type="image/png" href="{% static 'favicons-ee12127f414fa0c96616c436c05f46c6(pr-cy/favicon-32x32.png' %}" sizes="32x32" />
+    <link rel="manifest" href="{% static 'favicons-ee12127f414fa0c96616c436c05f46c6(pr-cy/site.webmanifest' %}" />
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
+  <!-- Nucleo Icons -->
+  <link href="{% static 'css/nucleo-icons.css' %}" rel="stylesheet" />
+  <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js" defer></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="{% static 'js/invoice.js' %}" defer></script>
+    <script src="{% static 'js/imask/Imask.min.js' %}"></script>
+
+  <!-- Font Awesome Icons -->
+  <!-- Material Icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="{% static 'css/material-dashboard.css' %}" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+</head>
+
+<body class="g-sidenav-show  bg-gray-100">
+  <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-radius-lg fixed-start ms-2  bg-white my-2" id="sidenav-main">
+    <div class="sidenav-header">
+      <i class="fas fa-times p-3 cursor-pointer text-dark opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+      <a class="navbar-brand px-4 py-3 m-0" href="/">
+        <img src="{% static 'img/small.png' %}" class="navbar-brand-img" width="26" height="26" alt="main_logo">
+        <span class="ms-1 text-sm text-dark">RFTK</span>
+      </a>
+    </div>
+    <hr class="horizontal dark mt-0 mb-2">
+    <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+            <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Счет</span>
+          </a>
+            </div>
+        </li>
+        <li class="nav-item">
+            <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">УПД</span>
+          </a>
+                <a href="{% url 'utd' %}" class="me-3"><i class="fa-duotone fa-solid fa-plus" style="color: orange;"></i></a>
+            </div>
+        </li>
+        <li class="nav-item">
+            <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Счет-фактура</span>
+          </a>
+            </div>
+        </li>
+<!--        <li class="nav-item">-->
+<!--            <i class="material-symbols-rounded opacity-5">receipt_long</i>-->
+<!--            <span class="nav-link-text ms-1">Товарная накладная</span>-->
+<!--          </a>-->
+<!--        </li>-->
+        <li class="nav-item">
+            <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">КП</span>
+          </a>
+            </div>
+        </li>
+        <li class="nav-item">
+            <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Смета</span>
+          </a>
+            </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">КС-2</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">КС-3</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Акт оказания услуг</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Доверенность</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Товарный чек</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">ПКО</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">РКО</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Акт сверки</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Договор/Документ</span>
+          </a>
+              </div>
+        </li>
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs text-dark font-weight-bolder" style="color: #FA980B!important;">Сервисы</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-dark" href="{% url 'profile' %}">
+            <i class="material-symbols-rounded opacity-5">person</i>
+            <span class="nav-link-text ms-1">Организации</span>
+          </a>
+        </li>
+          <li class="nav-item">
+          <a class="nav-link text-dark" href="{% url 'profile' %}">
+            <i class="material-symbols-rounded opacity-5">person</i>
+            <span class="nav-link-text ms-1">Контрагенты</span>
+          </a>
+        </li>
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs text-dark font-weight-bolder" style="color: #FA980B!important;">Личный кабинет</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-dark" href="{% url 'profile' %}">
+            <i class="material-symbols-rounded opacity-5">person</i>
+            <span class="nav-link-text ms-1">Профиль</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          {% if user.is_authenticated %}
+          <a class="nav-link text-dark" href="{% url 'logout' %}">
+            <i class="material-symbols-rounded opacity-5">logout</i>
+            <span class="nav-link-text ms-1">Выйти</span>
+          </a>
+          {% else %}
+          <a class="nav-link text-dark" href="{% url 'login' %}">
+            <i class="material-symbols-rounded opacity-5">login</i>
+            <span class="nav-link-text ms-1">Войти</span>
+          </a>
+          {% endif %}
+        </li>
+      </ul>
+    </div>
+  </aside>
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-3 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+
+        <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+          <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+
+          </div>
+          <ul class="navbar-nav d-flex align-items-center  justify-content-end">
+
+            <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+              <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+                <div class="sidenav-toggler-inner">
+                  <i class="sidenav-toggler-line"></i>
+                  <i class="sidenav-toggler-line"></i>
+                  <i class="sidenav-toggler-line"></i>
+                </div>
+              </a>
+            </li>
+
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="container-fluid py-2">
+      <div class="row">
+        <div class="col-12">
+          <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3">
+                <h6 class="text-white text-capitalize ps-3">Создание упд</h6>
+              </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+              <div class="card-body">
+                <form method="post" class="text-start">
+        {% csrf_token %}
+        <div class="card mb-4 p-3">
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <div class="card mb-4 p-3">
+                    <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">{{ form.name.label }} {% if form.name %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.name }}
+                        {% if form.name.help_text %}
+                            <small class="form-text text-muted">{{ form.name.help_text }}</small>
+                        {% endif %}
+                        <br>
+                        <label for="{{ form.date.id_for_label }}">{{ form.date.label }} {% if form.date %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.date }}
+                        {% if form.date.help_text %}
+                            <small class="form-text text-muted">{{ form.date.help_text }}</small>
+                        {% endif %}
+                        <br>
+                        <label for="{{ form.payment_document.id_for_label }}">{{ form.payment_document.label }} {% if form.payment_document %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.payment_document }}
+                        {% if form.payment_document.help_text %}
+                            <small class="form-text text-muted">{{ form.payment_document.help_text }}</small>
+                        {% endif %}
+<!--                        {% if field.name == "organization" or field.name == "counterparty" or field.name == "consignee" or field.name == "shipper" %}-->
+<!--                            <div class="mt-2">-->
+<!--                                {% if field.name == "organization" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="organization">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить организацию-->
+<!--                                    </button>-->
+<!--                                {% elif field.name == "consignee" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="consignee">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить грузополучателя-->
+<!--                                    </button>-->
+<!--                                {% elif field.name == "shipper" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="shipper">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить грузоотправителя-->
+<!--                                    </button>-->
+<!--                                {% else %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="counterparty">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить контрагента-->
+<!--                                    </button>-->
+<!--                                {% endif %}-->
+<!--                            </div>-->
+<!--                        {% endif %}-->
+                    </div>
+                        </div>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <div class="card mb-4 p-3">
+                        <h5>Информация об организации</h5>
+                    <div class="form-group">
+                        <label for="{{ form.organization.id_for_label }}">{{ form.organization.label }} {% if form.organization %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.organization }}
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="organization">
+                                        <i class="fas fa-plus"></i> Добавить организацию
+                                    </button>
+                        </div>
+                        {% if form.organization.help_text %}
+                            <small class="form-text text-muted">{{ form.organization.help_text }}</small>
+                        {% endif %}
+
+<!--                        {% if field.name == "organization" or field.name == "counterparty" or field.name == "consignee" or field.name == "shipper" %}-->
+<!--                            <div class="mt-2">-->
+<!--                                {% if field.name == "organization" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="organization">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить организацию-->
+<!--                                    </button>-->
+<!--                                {% elif field.name == "consignee" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="consignee">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить грузополучателя-->
+<!--                                    </button>-->
+<!--                                {% elif field.name == "shipper" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="shipper">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить грузоотправителя-->
+<!--                                    </button>-->
+<!--                                {% else %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="counterparty">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить контрагента-->
+<!--                                    </button>-->
+<!--                                {% endif %}-->
+<!--                            </div>-->
+<!--                        {% endif %}-->
+                    </div>
+                        </div>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <div class="card mb-4 p-3">
+                        <h5>Грузоотправитель</h5>
+                    <div class="form-group">
+                        <label for="{{ form.shipper.id_for_label }}">{{ form.shipper.label }} {% if form.shipper %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.shipper }}
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="shipper">
+                                        <i class="fas fa-plus"></i> Добавить грузоотправителя
+                                    </button>
+                        </div>
+                        {% if form.shipper.help_text %}
+                            <small class="form-text text-muted">{{ form.shipper.help_text }}</small>
+                        {% endif %}
+
+<!--                        {% if field.name == "organization" or field.name == "counterparty" or field.name == "consignee" or field.name == "shipper" %}-->
+<!--                            <div class="mt-2">-->
+<!--                                {% if field.name == "organization" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="organization">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить организацию-->
+<!--                                    </button>-->
+<!--                                {% elif field.name == "consignee" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="consignee">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить грузополучателя-->
+<!--                                    </button>-->
+<!--                                {% elif field.name == "shipper" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="shipper">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить грузоотправителя-->
+<!--                                    </button>-->
+<!--                                {% else %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="counterparty">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить контрагента-->
+<!--                                    </button>-->
+<!--                                {% endif %}-->
+<!--                            </div>-->
+<!--                        {% endif %}-->
+                    </div>
+                        </div>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <div class="card mb-4 p-3">
+                        <h5>Контрагент</h5>
+                    <div class="form-group">
+                        <label for="{{ form.counterparty.id_for_label }}">{{ form.counterparty.label }} {% if form.counterparty %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.counterparty }}
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="counterparty">
+                                        <i class="fas fa-plus"></i> Добавить контрагента
+                                    </button>
+                        </div>
+                        {% if form.counterparty.help_text %}
+                            <small class="form-text text-muted">{{ form.counterparty.help_text }}</small>
+                        {% endif %}
+
+<!--                        {% if field.name == "organization" or field.name == "counterparty" or field.name == "consignee" or field.name == "shipper" %}-->
+<!--                            <div class="mt-2">-->
+<!--                                {% if field.name == "organization" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="organization">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить организацию-->
+<!--                                    </button>-->
+<!--                                {% elif field.name == "consignee" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="consignee">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить грузополучателя-->
+<!--                                    </button>-->
+<!--                                {% elif field.name == "shipper" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="shipper">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить грузоотправителя-->
+<!--                                    </button>-->
+<!--                                {% else %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="counterparty">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить контрагента-->
+<!--                                    </button>-->
+<!--                                {% endif %}-->
+<!--                            </div>-->
+<!--                        {% endif %}-->
+                    </div>
+                        </div>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <div class="card mb-4 p-3">
+                        <h5>Грузополучатель</h5>
+                    <div class="form-group">
+                        <label for="{{ form.consignee.id_for_label }}">{{ form.consignee.label }} {% if form.consignee %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.consignee }}
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="consignee">
+                                        <i class="fas fa-plus"></i> Добавить грузополучателя
+                                    </button>
+                        </div>
+                        {% if form.consignee.help_text %}
+                            <small class="form-text text-muted">{{ form.consignee.help_text }}</small>
+                        {% endif %}
+
+<!--                        {% if field.name == "organization" or field.name == "counterparty" or field.name == "consignee" or field.name == "shipper" %}-->
+<!--                            <div class="mt-2">-->
+<!--                                {% if field.name == "organization" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="organization">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить организацию-->
+<!--                                    </button>-->
+<!--                                {% elif field.name == "consignee" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="consignee">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить грузополучателя-->
+<!--                                    </button>-->
+<!--                                {% elif field.name == "shipper" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="shipper">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить грузоотправителя-->
+<!--                                    </button>-->
+<!--                                {% else %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="counterparty">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить контрагента-->
+<!--                                    </button>-->
+<!--                                {% endif %}-->
+<!--                            </div>-->
+<!--                        {% endif %}-->
+                    </div>
+                        </div>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <div class="card mb-4 p-3">
+                        <h5>Дополнительно</h5>
+                    <div class="form-group">
+                        <label for="{{ form.shipping_document.id_for_label }}">{{ form.shipping_document.label }} {% if form.shipping_document %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.shipping_document }}
+
+                        {% if form.shipping_document.help_text %}
+                            <small class="form-text text-muted">{{ form.shipping_document.help_text }}</small>
+                        {% endif %}
+                        <br>
+                        <label for="{{ form.state_ID_contract.id_for_label }}">{{ form.state_ID_contract.label }} {% if form.state_ID_contract %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.state_ID_contract }}
+
+                        {% if form.state_ID_contract.help_text %}
+                            <small class="form-text text-muted">{{ form.state_ID_contract.help_text }}</small>
+                        {% endif %}
+                        <br>
+                        <label for="{{ form.basis_for_transfer.id_for_label }}">{{ form.basis_for_transfer.label }} {% if form.basis_for_transfer %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.basis_for_transfer }}
+
+                        {% if form.basis_for_transfer.help_text %}
+                            <small class="form-text text-muted">{{ form.basis_for_transfer.help_text }}</small>
+                        {% endif %}
+                        <br>
+                        <label for="{{ form.data_transportation.id_for_label }}">{{ form.data_transportation.label }} {% if form.data_transportation %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.data_transportation }}
+
+                        {% if form.data_transportation.help_text %}
+                            <small class="form-text text-muted">{{ form.data_transportation.help_text }}</small>
+                        {% endif %}
+                        <br>
+                        <label for="{{ form.shipment_date.id_for_label }}">{{ form.shipment_date.label }} {% if form.shipment_date %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.shipment_date }}
+
+                        {% if form.shipment_date.help_text %}
+                            <small class="form-text text-muted">{{ form.shipment_date.help_text }}</small>
+                        {% endif %}
+                        <br>
+                        <label for="{{ form.date_of_receipt.id_for_label }}">{{ form.date_of_receipt.label }} {% if form.date_of_receipt %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.date_of_receipt }}
+
+                        {% if form.date_of_receipt.help_text %}
+                            <small class="form-text text-muted">{{ form.date_of_receipt.help_text }}</small>
+                        {% endif %}
+                        <br>
+                        <label for="{{ form.type_document.id_for_label }}">{{ form.type_document.label }} {% if form.type_document %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.type_document }}
+                        <br>
+
+                        {% if form.type_document.help_text %}
+                            <small class="form-text text-muted">{{ form.type_document.help_text }}</small>
+                        {% endif %}
+                        <br>
+                        <label for="{{ form.currency.id_for_label }}">{{ form.currency.label }} {% if form.currency %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.currency }}
+                        <br>
+
+                        {% if form.currency.help_text %}
+                            <small class="form-text text-muted">{{ form.currency.help_text }}</small>
+                        {% endif %}
+                        <br>
+                        <label for="{{ form.nds.id_for_label }}">{{ form.nds.label }} {% if form.nds %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.nds }}
+                        <br>
+
+                        {% if form.nds.help_text %}
+                            <small class="form-text text-muted">{{ form.nds.help_text }}</small>
+                        {% endif %}
+                        <br>
+                        <label for="{{ form.is_stamp.id_for_label }}" style="font-weight: 700; color: red; font-size: 18px;">{{ form.is_stamp.label }} {% if form.is_stamp %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.is_stamp }}
+
+                        {% if form.is_stamp.help_text %}
+                            <small class="form-text text-muted">{{ form.is_stamp.help_text }}</small>
+                        {% endif %}
+
+<!--                        {% if field.name == "organization" or field.name == "counterparty" or field.name == "consignee" or field.name == "shipper" %}-->
+<!--                            <div class="mt-2">-->
+<!--                                {% if field.name == "organization" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="organization">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить организацию-->
+<!--                                    </button>-->
+<!--                                {% elif field.name == "consignee" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="consignee">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить грузополучателя-->
+<!--                                    </button>-->
+<!--                                {% elif field.name == "shipper" %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="shipper">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить грузоотправителя-->
+<!--                                    </button>-->
+<!--                                {% else %}-->
+<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="counterparty">-->
+<!--                                        <i class="fas fa-plus"></i> Добавить контрагента-->
+<!--                                    </button>-->
+<!--                                {% endif %}-->
+<!--                            </div>-->
+<!--                        {% endif %}-->
+                    </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        {{ formset.management_form }}
+
+        <div class="card p-3">
+            <h5 class="mb-3">Состав счета</h5>
+            <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width: 30px; min-width: 30px;">#</th>
+                        <th style="width: 30px; min-width: 30px;"></th>
+                        <th style="width: 100px; min-width: 100px;">Код товара / услуг</th>
+                        <th style="width: 190px; min-width: 190px;">Наименование</th>
+                        <th style="width: 100px; min-width: 100px;">Код вида товара</th>
+                        <th style="width: 100px; min-width: 100px;">Код ед.измерения</th>
+                        <th style="width: 100px; min-width: 100px;">Единица измерения</th>
+                        <th style="width: 100px; min-width: 100px;">Акциз</th>
+                        <th style="width: 120px; min-width: 120px;">Количество</th>
+                        <th style="width: 150px; min-width: 150px;">Цена</th>
+                        <th style="width: 150px; min-width: 150px;">Сумма</th>
+                        <th style="width: 100px; min-width: 100px;">Страна</th>
+                        <th style="width: 100px; min-width: 100px;">№ ГТД</th>
+                        <th style="width: 30px; min-width: 30px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="formset-body">
+                    {% for form in formset %}
+                        <tr class="form-row">
+                            <td class="row-number">{{ forloop.counter }}</td>
+                            {{ form.id }}
+                            <td>
+                                <button type="button" class="btn  drag-handle" title="Перетащить">
+                                    <i class="fas fa-arrows-alt"></i>
+                                </button>
+                                <button type="button" class="btn btn-success add-row">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                                <button type="button" class="btn remove-row">
+                                    <i class="fa-solid fa-minus"></i>
+                                </button>
+                            </td>
+                            <td>{{ form.product_code }}</td>
+                            <td>{{ form.name }}</td>
+                            <td>{{ form.product_type_code }}</td>
+                            <td class="code_unit">
+                                <input class="form-control">
+                            </td>
+                            <td class="unit_of_measurement">{{ form.unit_of_measurement }}</td>
+                            <td>{{ form.excise}}</td>
+                            <td class="quantity">{{ form.quantity }}</td>
+                            <td class="price">{{ form.price }}</td>
+                            <td class="amount">{{ form.amount }}</td>
+                            <td>{{ form.country }}</td>
+                            <td>{{ form.number_GTD }}</td>
+                            <td>
+                                <button type="button" class="btn  drag-handle" title="Перетащить">
+                                    <i class="fas fa-arrows-alt"></i>
+                                </button>
+                                <button type="button" class="btn btn-success add-row">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                                <button type="button" class="btn remove-row">
+                                    <i class="fa-solid fa-minus"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+            </div>
+            <div class="d-flex align-items-center" style="gap: 10px;">
+            <button type="button" class="btn btn-primary mb-3 w-md-30 w-sm-100 mt-3" id="duplicate-last-row">
+                <i class="fas fa-copy"></i> Дублировать последнюю строку
+            </button>
+                <button type="button" class="btn btn-success mt-3 add-new-last-row" id="add-new-last-row">Добавить строку</button>
+                </div>
+            <p><span style="font-weight: 700; font-size: 18px;">Итого:</span> <span style="font-weight: 700; font-size: 18px;" id="total-sum"></span></p>
+            <p><span style="font-weight: 700; font-size: 18px;">Сумма НДС:</span> <span style="font-weight: 700; font-size: 18px;" id="total-nds"></span></p>
+        </div>
+
+        <div class="d-flex justify-content-start" style="margin-top: 7px;">
+            <button type="submit" class="btn btn-primary" style="margin-right: 7px; background-color:#e91e63;" onclick="resetDownload(); this.form.target='preview_' + Date.now()">Сохранить</button>
+            <button type="submit" class="btn btn-success" onclick="setDownloadExcel()">Excel</button>
+            <input type="hidden" name="download_excel" id="download_excel" value="false">
+            <button type="submit" class="btn btn-info" onclick="setDownloadPdf()" style="margin-left: 7px;">PDF</button>
+            <input type="hidden" name="download_pdf" id="download_pdf" value="false">
+        </div>
+      </form>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+      <div class="modal fade" id="addOrganizationModal" tabindex="-1" aria-labelledby="addOrganizationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addOrganizationModalLabel">Добавить организацию и банковские реквизиты</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="organizationForm" method="post" action="">
+                        {% csrf_token %}
+                        <h5>Информация о организации</h5>
+                        <div class="row">
+                        {% for field in org_form %}
+                            <div class="col-md-6 mb-3 form-floating">
+                            {% if field.name == 'inn'%}
+                            <div class="input-group">
+                                {{ field }}
+                                <button type="button" class="btn btn-primary" id="findByINN" style="background-color:#e91e63;">Найти</button>
+                            </div>
+                            <div id="innSuggestions" class="dropdown-menu"></div>
+                            {% else %}
+                            {{ field }}
+                                <label class="form-label">{{ field.label }}</label>
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% endif %}
+                            </div>
+                        {% endfor %}
+                        </div>
+
+                        <div class="text-left mt-3">
+                            <input type="hidden" name="modal_type" id="modal_type">
+                            <button type="submit" class="btn btn-success">Сохранить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <!-- Modal для добавления контрагента -->
+   <div class="modal fade" id="addCounterpartyModal" tabindex="-1" aria-labelledby="addCounterpartyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCounterpartyModalLabel">Добавить контрагента и банковские реквизиты</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="counterpartyForm" method="post" action="">
+                        {% csrf_token %}
+                        <h5>Информация о контрагенте</h5>
+                        <div class="row">
+                        {% for field in counterparty_form %}
+                            <div class="col-md-6 mb-3 form-floating">
+                            {% if field.name == 'inn'%}
+                            <div class="input-group">
+                                {{ field }}
+                                <button type="button" class="btn btn-primary" id="findByINNCounterparty" style="background-color:#e91e63;">Найти</button>
+                            </div>
+                            <div id="innSuggestionsCounterparty" class="dropdown-menu"></div>
+                            {% else %}
+                            {{ field }}
+                                <label class="form-label">{{ field.label }}</label>
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% endif %}
+                            </div>
+                        {% endfor %}
+                        </div>
+
+                        <div class="text-left mt-3">
+                            <input type="hidden" name="modal_type_consignee" id="modal_type_consignee">
+                            <button type="submit" class="btn btn-success">Сохранить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+  </main>
+
+  <!--   Core JS Files   -->
+
+  <!-- Github buttons -->
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="{% static 'js/material-dashboard.min.js' %}"></script>
+</body>
+<script>
+    function setDownloadExcel() {
+        document.getElementById('download_pdf').value = "false";
+        document.getElementById('download_excel').value = "true";
+    };
+    function setDownloadPdf() {
+        document.getElementById('download_excel').value = "false";
+        document.getElementById('download_pdf').value = "true";
+    };
+    function resetDownload() {
+        document.getElementById('download_excel').value = "false";
+        document.getElementById('download_pdf').value = "false";
+    };
+</script>
+<script defer>
+document.addEventListener('DOMContentLoaded', () => {
+
+    document.querySelectorAll('input[type="tel"]').forEach(input => {
+        let phoneMask = IMask(input, { mask: "+{7} (000) 000-00-00" });
+
+        function validatePhoneNumber() {
+            let t = input.value.replace(/\D/g, "");
+            return t.length < 11 ? (input.setCustomValidity("Необходимо минимум 11 цифр"), !1) : (input.setCustomValidity(""), !0);
+        }
+
+        input.addEventListener("input", validatePhoneNumber);
+    });
+});
+</script>
+</html>

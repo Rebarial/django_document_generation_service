@@ -19,39 +19,39 @@ class InvoiceForPaymentExcelDocumentCreate(BaseExcelDocumentCreate):
         sheet = workbook.active
         offset = []
 
-        if "document_name" in self.document_dict:
+        if "document_name" in self.document_dict["Custom_data"]:
 
-            number = self.document_dict["document_name"]["number"]
+            number = self.document_dict["Custom_data"]["document_name"]["number"]
             if hasattr(document, number) and getattr(document, number):
-                sheet[self.get_cell_ref(self.document_dict["document_name"]["cell"], offset)].value += getattr(document, number)
+                sheet[self.get_cell_ref(self.document_dict["Custom_data"]["document_name"]["cell"], offset)].value += getattr(document, number)
 
-            date = self.document_dict["document_name"]["date"]
+            date = self.document_dict["Custom_data"]["document_name"]["date"]
             if hasattr(document, date) and getattr(document, date):
-                sheet[self.get_cell_ref(self.document_dict["document_name"]["cell"], offset)].value += f' от {getattr(document, date).day}" {getattr(document, date).strftime("%B %Y г.")}'
+                sheet[self.get_cell_ref(self.document_dict["Custom_data"]["document_name"]["cell"], offset)].value += f' от {getattr(document, date).day}" {getattr(document, date).strftime("%B %Y г.")}'
 
             
 
         invoice_organization_info_dict_value = []
-        for item in self.document_dict["invoice_organization_info_value"]:
+        for item in self.document_dict["Custom_data"]["invoice_organization_info_value"]:
             invoice_organization_info_dict_value.append({"info": str(getattr(document, item))})
 
         offset.append({
-                "cell_itmes_number": self.document_dict["invoice_organization_info_cell_number"],
+                "cell_itmes_number": self.document_dict["Custom_data"]["invoice_organization_info_cell_number"],
                 "offset": self.add_document_itmes(
                     sheet=sheet,
                     items=invoice_organization_info_dict_value,
-                    cell_itmes_number=self.document_dict["invoice_organization_info_cell_number"], 
-                    items_name="invoice_organization_info_items",
+                    cell_itmes_number=self.document_dict["Custom_data"]["invoice_organization_info_cell_number"], 
+                    items_content=self.document_dict["Custom_data"]["invoice_organization_info_items"],
                     height_orientation_name = "info",
                     height_orientation_column = "A",
                 )
         })
 
-        fill_dict = self.fill_doc(document, sheet, offset)
+        fill_dict = self.fill_doc(document, sheet, offset, self.document_dict["Custom_data"]["inn_field"])
 
         #Добавляем разрывы в зависимости от занимаемого места
-        if "break_points" in self.document_dict:
-            self.add_rows_break(sheet, self.document_dict["break_points"], offset)
+        if "Break_points" in self.document_dict:
+            self.add_rows_break(sheet, self.document_dict["Break_points"], offset)
 
         #Для корректного отображения с toPDF_libre
         sheet.page_setup.scale = 99

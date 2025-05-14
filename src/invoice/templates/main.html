@@ -1,0 +1,354 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>
+    Главная | RFTK
+  </title>
+    <link rel="icon" type="image/png" href="{% static 'favicons-ee12127f414fa0c96616c436c05f46c6(pr-cy/favicon-32x32.png' %}" sizes="32x32" />
+    <link rel="manifest" href="{% static 'favicons-ee12127f414fa0c96616c436c05f46c6(pr-cy/site.webmanifest' %}" />
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
+  <!-- Nucleo Icons -->
+  <link href="{% static 'css/nucleo-icons.css' %}" rel="stylesheet" />
+  <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <!-- Material Icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <!-- CSS Files -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link id="pagestyle" href="{% static 'css/material-dashboard.css' %}" rel="stylesheet" />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="g-sidenav-show  bg-gray-100">
+  <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-radius-lg fixed-start ms-2  bg-white my-2" id="sidenav-main">
+    <div class="sidenav-header">
+      <i class="fas fa-times p-3 cursor-pointer text-dark opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+      <a class="navbar-brand px-4 py-3 m-0" href="/">
+        <img src="{% static 'img/small.png' %}" class="navbar-brand-img" width="26" height="26" alt="main_logo">
+        <span class="ms-1 text-sm text-dark">RFTK</span>
+      </a>
+    </div>
+    <hr class="horizontal dark mt-0 mb-2">
+    <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+            <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Счет</span>
+          </a>
+            </div>
+        </li>
+        <li class="nav-item">
+            <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">УПД</span>
+          </a>
+          <a href="{% url 'utd' %}" class="me-3"><i class="fa-duotone fa-solid fa-plus" style="color: orange;"></i></a>
+            </div>
+        </li>
+        <li class="nav-item">
+            <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Счет-фактура</span>
+          </a>
+            </div>
+        </li>
+<!--        <li class="nav-item">-->
+<!--            <i class="material-symbols-rounded opacity-5">receipt_long</i>-->
+<!--            <span class="nav-link-text ms-1">Товарная накладная</span>-->
+<!--          </a>-->
+<!--        </li>-->
+        <li class="nav-item">
+            <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">КП</span>
+          </a>
+            </div>
+        </li>
+        <li class="nav-item">
+            <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Смета</span>
+          </a>
+            </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">КС-2</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">КС-3</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Акт оказания услуг</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Доверенность</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Товарный чек</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">ПКО</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">РКО</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Акт сверки</span>
+          </a>
+              </div>
+        </li>
+          <li class="nav-item">
+              <div class="d-flex align-items-center justify-content-between">
+            <i class="material-symbols-rounded opacity-5">receipt_long</i>
+            <span class="nav-link-text ms-1">Договор/Документ</span>
+          </a>
+              </div>
+        </li>
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs text-dark font-weight-bolder" style="color: #FA980B!important;">Сервисы</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-dark" href="{% url 'profile' %}">
+            <i class="material-symbols-rounded opacity-5">person</i>
+            <span class="nav-link-text ms-1">Организации</span>
+          </a>
+        </li>
+          <li class="nav-item">
+          <a class="nav-link text-dark" href="{% url 'profile' %}">
+            <i class="material-symbols-rounded opacity-5">person</i>
+            <span class="nav-link-text ms-1">Контрагенты</span>
+          </a>
+        </li>
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs text-dark font-weight-bolder" style="color: #FA980B!important;">Личный кабинет</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-dark" href="{% url 'profile' %}">
+            <i class="material-symbols-rounded opacity-5">person</i>
+            <span class="nav-link-text ms-1">Профиль</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          {% if user.is_authenticated %}
+          <a class="nav-link text-dark" href="{% url 'logout' %}">
+            <i class="material-symbols-rounded opacity-5">logout</i>
+            <span class="nav-link-text ms-1">Выйти</span>
+          </a>
+          {% else %}
+          <a class="nav-link text-dark" href="{% url 'login' %}">
+            <i class="material-symbols-rounded opacity-5">login</i>
+            <span class="nav-link-text ms-1">Войти</span>
+          </a>
+          {% endif %}
+        </li>
+      </ul>
+    </div>
+  </aside>
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-3 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+
+        <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+          <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+
+          </div>
+          <ul class="navbar-nav d-flex align-items-center  justify-content-end">
+
+            <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+              <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+                <div class="sidenav-toggler-inner">
+                  <i class="sidenav-toggler-line"></i>
+                  <i class="sidenav-toggler-line"></i>
+                  <i class="sidenav-toggler-line"></i>
+                </div>
+              </a>
+            </li>
+
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="container-fluid py-3">
+      <div class="row d-flex">
+        <div class="card p-4">
+            <h5 class="text-center" style="font-size: 18px!important;">Добро пожаловать на <span style="color: #FA980B!important">RFTK</span> — ваш надёжный помощник в создании <br>и заполнении документов онлайн!</h5>
+            <div class="row mt-5">
+                <div class="col-md-5">
+                    <img src="{% static 'img/Frame 707.png' %}" class="img-fluid">
+                </div>
+                <div class="col-md-7 d-flex align-items-center">
+                    <p style="color: black!important; font-size: 16px;">
+                        Мы понимаем, как важно иметь доступ к качественным и удобным инструментам для работы с документами.
+                        Наша платформа предлагает широкий выбор готовых бланков для различных нужд.
+                        Все наши бланки разработаны с учетом актуальных стандартов и требований,
+                        что позволяет вам быть уверенными в их юридической силе.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+      <div class="text-center bg-warning text-white py-1 mt-5 rounded" style="background-color: #FA980B!important">
+        <h4>Как это работает?</h4>
+    </div>
+
+      <div class="row mt-5">
+        <!-- Первый шаг -->
+        <div class="col-md-7 d-flex align-items-center">
+            <h4 class="text-warning me-3" style="color: #FA980B!important">/01</h4>
+            <p style="color: black!important; font-size: 17px;">Просмотрите нашу библиотеку и выберите нужный документ.</p>
+        </div>
+        <div class="col-md-5">
+            <div class="border rounded p-2 text-center bg-warning text-white" style="background-color: #FA980B!important; border-radius: 20px!important; font-size: 17px;">Выберите бланк</div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <!-- Второй шаг -->
+        <div class="col-md-7 d-flex align-items-center">
+            <h4 class="text-warning me-3" style="color: #FA980B!important">/02</h4>
+            <p style="color: black!important; font-size: 17px;">Заполните необходимые поля прямо на сайте.</p>
+        </div>
+        <div class="col-md-5">
+            <div class="border rounded p-2 text-center bg-warning text-white" style="background-color: #FA980B!important; border-radius: 20px!important; font-size: 17px;">Заполните поля</div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <!-- Третий шаг -->
+        <div class="col-md-7 d-flex align-items-center">
+            <h4 class="text-warning me-3" style="color: #FA980B!important">/03</h4>
+            <p style="color: black!important; font-size: 17px;">После завершения вы можете сохранить документ на своём устройстве или распечатать его.</p>
+        </div>
+        <div class="col-md-5">
+            <div class="border rounded p-2 text-center bg-warning text-white" style="background-color: #FA980B!important; border-radius: 20px!important; font-size: 17px;">Сохраните или распечатайте</div>
+        </div>
+    </div>
+
+      <div class="card p-4 mt-5">
+        <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                        Нужно ли платить за использование бланков?
+                    </button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Некоторые бланки доступны бесплатно, а другие требуют оплаты.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                        Есть ли возможность распечатать готовый документ?
+                    </button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Да, после заполнения документа его можно распечатать или сохранить в PDF.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                        Как внести изменения в уже заполненный документ?
+                    </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Вы можете отредактировать документ перед его окончательным сохранением.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                        Можно ли сохранить заполненный бланк на своем устройстве?
+                    </button>
+                </h2>
+                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Да, документ можно скачать в PDF или другом формате.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                        Какие документы можно создать с помощью онлайн бланков?
+                    </button>
+                </h2>
+                <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Доступны шаблоны договоров, заявлений, анкет и других документов.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    </div>
+  </main>
+
+  <!--   Core JS Files   -->
+
+  <!-- Github buttons -->
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="{% static 'js/material-dashboard.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

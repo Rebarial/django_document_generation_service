@@ -19,7 +19,7 @@ class UPDExcelDocumentCreate(BaseExcelDocumentCreate):
         sheet = workbook.active
         offset = []
 
-        self.fill_doc(document, sheet, offset)
+        self.fill_doc(document, sheet, offset, "seller_inn")
 
         #!!Костыль для проверки на одинаковый ИНН продавца и грузоотправителя
         cell_consignor = "AP9"
@@ -33,8 +33,8 @@ class UPDExcelDocumentCreate(BaseExcelDocumentCreate):
             #self.calculate_row_height(value, sheet[cell_consignor].font, sheet.column_dimensions["AP"].width)
     
         #Добавляем разрывы в зависимости от занимаемого места
-        if "break_points" in self.document_dict:
-            self.add_rows_break(sheet, self.document_dict["break_points"], offset)
+        if "Break_points" in self.document_dict:
+            self.add_rows_break(sheet, self.document_dict["Break_points"], offset)
 
         #Для корректного отображения с toPDF_libre
         sheet.page_setup.scale = 99
