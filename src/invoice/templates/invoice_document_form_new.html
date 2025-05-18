@@ -1,6 +1,19 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Создать новый счет | RFTK{% endblock %}
+{% load custom_filters %}
+{% block title %}Создать новый счет на оплату{% endblock %}
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js" defer></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="{% static 'js/myjs/invoice_form.js' %}" defer></script>
+<script src="{% static 'js/myjs/modal_filler.js' %}" defer></script>
+<script src="{% static 'js/myjs/select_rows.js' %}" defer></script>
+<!-- <script src="{% static 'js/invoice.js' %}" defer></script>-->
+<script src="{% static 'js/imask/Imask.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+{% endblock %}
 {% block content %}
   <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
     <!-- Navbar -->
@@ -47,38 +60,18 @@
                 <div class="col-md-12 mb-3">
                     <div class="card mb-4 p-3">
                     <div class="form-group">
-                        <label for="{{ form.name.id_for_label }}">{{ form.name.label }} {% if form.name %}<span style="color:red;">*</span>{% endif %}</label>
-                        {{ form.name }}
+                        <label for="{{ form.name.id_for_label }}">{{ form.number.label }} {% if form.number|is_required %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.number }}
                         {% if form.name.help_text %}
                             <small class="form-text text-muted">{{ form.date.help_text }}</small>
                         {% endif %}
                         <br>
-                        <label for="{{ form.date.id_for_label }}">{{ form.date.label }} {% if form.date %}<span style="color:red;">*</span>{% endif %}</label>
+                        <label for="{{ form.date.id_for_label }}">{{ form.date.label }} {% if form.date|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.date }}
                         {% if form.date.help_text %}
                             <small class="form-text text-muted">{{ form.date.help_text }}</small>
                         {% endif %}
-<!--                        {% if field.name == "organization" or field.name == "counterparty" or field.name == "consignee" or field.name == "bank_organization" %}-->
-<!--                            <div class="mt-2">-->
-<!--                                {% if field.name == "organization" %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="organization">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить организацию-->
-<!--                                    </button>-->
-<!--                                {% elif field.name == "consignee" %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="consignee">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить грузополучателя-->
-<!--                                    </button>-->
-<!--                                {% elif field.name == "bank_organization" %}-->
-<!--                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addBankModal" style="border-color:#e91e63; color:red;">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить банк-->
-<!--                                    </button>-->
-<!--                                {% else %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="counterparty">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить контрагента-->
-<!--                                    </button>-->
-<!--                                {% endif %}-->
-<!--                            </div>-->
-<!--                        {% endif %}-->
+
                     </div>
                     </div>
                 </div>
@@ -86,47 +79,26 @@
                     <div class="card mb-4 p-3">
                         <h5>Информация об организации</h5>
                     <div class="form-group">
-                        <label for="{{ form.organization.id_for_label }}">{{ form.organization.label }} {% if form.organization %}<span style="color:red;">*</span>{% endif %}</label>
+                        <label for="{{ form.organization.id_for_label }}">{{ form.organization.label }} {% if form.organization|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.organization }}
                         <div class="mt-2">
-                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="organization">
-                                        <i class="fas fa-plus"></i> Добавить организацию
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#f8a222; color:rgb(240, 146, 38);" data-modal-type="organization">
+                                        <i class="fas fa-edit"></i> Редактировать организацию
                                     </button>
                         </div>
                         {% if form.organization.help_text %}
                             <small class="form-text text-muted">{{ form.organization.help_text }}</small>
                         {% endif %}
-                        <label for="{{ form.bank_organization.id_for_label }}">{{ form.bank_organization.label }} {% if form.bank_organization %}<span style="color:red;">*</span>{% endif %}</label>
-                        {{ form.bank_organization }}
+                        <label for="{{ form.bank_organization.id_for_label }}">{{ form.organization_bank.label }} {% if form.organization_bank|is_required %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.organization_bank }}
                         <div class="mt-2">
                             <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addBankModal" style="border-color:#e91e63; color:red;">
                                         <i class="fas fa-plus"></i> Добавить банк
                                     </button>
                             </div>
-                        {% if form.bank_organization.help_text %}
-                            <small class="form-text text-muted">{{ form.bank_organization.help_text }}</small>
+                        {% if form.organization_bank.help_text %}
+                            <small class="form-text text-muted">{{ form.organization_bank.help_text }}</small>
                         {% endif %}
-<!--                        {% if field.name == "organization" or field.name == "counterparty" or field.name == "consignee" or field.name == "bank_organization" %}-->
-<!--                            <div class="mt-2">-->
-<!--                                {% if field.name == "organization" %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="organization">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить организацию-->
-<!--                                    </button>-->
-<!--                                {% elif field.name == "consignee" %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="consignee">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить грузополучателя-->
-<!--                                    </button>-->
-<!--                                {% elif field.name == "bank_organization" %}-->
-<!--                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addBankModal" style="border-color:#e91e63; color:red;">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить банк-->
-<!--                                    </button>-->
-<!--                                {% else %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="counterparty">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить контрагента-->
-<!--                                    </button>-->
-<!--                                {% endif %}-->
-<!--                            </div>-->
-<!--                        {% endif %}-->
                     </div>
                     </div>
                 </div>
@@ -134,17 +106,17 @@
                     <div class="card mb-4 p-3">
                         <h5>Покупатель</h5>
                     <div class="form-group">
-                        <label for="{{ form.counterparty.id_for_label }}">{{ form.counterparty.label }} {% if form.counterparty %}<span style="color:red;">*</span>{% endif %}</label>
+                        <label for="{{ form.counterparty.id_for_label }}">{{ form.buyer.label }} {% if form.buyer|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.counterparty }}
                         <div class="mt-2">
-                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="counterparty">
-                                        <i class="fas fa-plus"></i> Добавить контрагента
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#f8a222; color:rgb(240, 146, 38);" data-modal-type="counterparty">
+                                        <i class="fas fa-edit"></i> Редактировать контрагента
                                     </button>
                         </div>
                         {% if form.counterparty.help_text %}
                             <small class="form-text text-muted">{{ form.counterparty.help_text }}</small>
                         {% endif %}
-                        <label for="{{ form.bank_counterparty.id_for_label }}">{{ form.bank_counterparty.label }} {% if form.bank_counterparty %}<span style="color:red;">*</span>{% endif %}</label>
+                        <label for="{{ form.bank_counterparty.id_for_label }}">{{ form.buyer_bank.label }} {% if form.buyer_bank|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.bank_counterparty }}
                         <div class="mt-2">
                             <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addBankCounModal" style="border-color:#e91e63; color:red;">
@@ -155,27 +127,6 @@
                         {% if form.bank_counterparty.help_text %}
                             <small class="form-text text-muted">{{ form.bank_counterparty.help_text }}</small>
                         {% endif %}
-<!--                        {% if field.name == "organization" or field.name == "counterparty" or field.name == "consignee" or field.name == "bank_organization" %}-->
-<!--                            <div class="mt-2">-->
-<!--                                {% if field.name == "organization" %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="organization">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить организацию-->
-<!--                                    </button>-->
-<!--                                {% elif field.name == "consignee" %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="consignee">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить грузополучателя-->
-<!--                                    </button>-->
-<!--                                {% elif field.name == "bank_organization" %}-->
-<!--                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addBankModal" style="border-color:#e91e63; color:red;">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить банк-->
-<!--                                    </button>-->
-<!--                                {% else %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="counterparty">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить контрагента-->
-<!--                                    </button>-->
-<!--                                {% endif %}-->
-<!--                            </div>-->
-<!--                        {% endif %}-->
                     </div>
                     </div>
                 </div>
@@ -183,38 +134,16 @@
                     <div class="card mb-4 p-3">
                         <h5>Грузополучатель</h5>
                     <div class="form-group">
-                        <label for="{{ form.consignee.id_for_label }}">{{ form.consignee.label }} {% if form.consignee %}<span style="color:red;">*</span>{% endif %}</label>
+                        <label for="{{ form.consignee.id_for_label }}">{{ form.consignee.label }} {% if form.consignee|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.consignee }}
                         <div class="mt-2">
-                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="consignee">
-                                        <i class="fas fa-plus"></i> Добавить грузополучателя
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addConsigneeModal" style="border-color:#f8a222; color:rgb(240, 146, 38);" data-modal-type="consignee">
+                                        <i class="fas fa-edit"></i> Редактировать грузополучателя
                                     </button>
                         </div>
                         {% if form.consignee.help_text %}
                             <small class="form-text text-muted">{{ form.consignee.help_text }}</small>
                         {% endif %}
-
-<!--                        {% if field.name == "organization" or field.name == "counterparty" or field.name == "consignee" or field.name == "bank_organization" %}-->
-<!--                            <div class="mt-2">-->
-<!--                                {% if field.name == "organization" %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="organization">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить организацию-->
-<!--                                    </button>-->
-<!--                                {% elif field.name == "consignee" %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="consignee">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить грузополучателя-->
-<!--                                    </button>-->
-<!--                                {% elif field.name == "bank_organization" %}-->
-<!--                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addBankModal" style="border-color:#e91e63; color:red;">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить банк-->
-<!--                                    </button>-->
-<!--                                {% else %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="counterparty">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить контрагента-->
-<!--                                    </button>-->
-<!--                                {% endif %}-->
-<!--                            </div>-->
-<!--                        {% endif %}-->
                     </div>
                     </div>
                 </div>
@@ -222,7 +151,7 @@
                     <div class="card mb-4 p-3">
                         <h5>Дополнительно</h5>
                     <div class="form-group">
-                        <label for="{{ form.purpose_of_payment.id_for_label }}">{{ form.purpose_of_payment.label }} {% if form.purpose_of_payment %}<span style="color:red;">*</span>{% endif %}</label>
+                        <label for="{{ form.purpose_of_payment.id_for_label }}">{{ form.purpose_of_payment.label }} {% if form.purpose_of_payment|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.purpose_of_payment }}
 
                         {% if form.purpose_of_payment.help_text %}
@@ -230,7 +159,7 @@
                         {% endif %}
                         <br>
 
-                        <label for="{{ form.payment_for.id_for_label }}">{{ form.payment_for.label }} {% if form.payment_for %}<span style="color:red;">*</span>{% endif %}</label>
+                        <label for="{{ form.payment_for.id_for_label }}">{{ form.payment_for.label }} {% if form.payment_for|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.payment_for }}
 
                         {% if form.payment_for.help_text %}
@@ -238,7 +167,7 @@
                         {% endif %}
                         <br>
 
-                        <label for="{{ form.agreement.id_for_label }}">{{ form.agreement.label }} {% if form.agreement %}<span style="color:red;">*</span>{% endif %}</label>
+                        <label for="{{ form.agreement.id_for_label }}">{{ form.agreement.label }} {% if form.agreement|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.agreement }}
 
                         {% if form.agreement.help_text %}
@@ -246,7 +175,7 @@
                         {% endif %}
                         <br>
 
-                        <label for="{{ form.currency.id_for_label }}">{{ form.currency.label }} {% if form.currency %}<span style="color:red;">*</span>{% endif %}</label>
+                        <label for="{{ form.currency.id_for_label }}">{{ form.currency.label }} {% if form.currency|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.currency }}
                          <br>
 
@@ -255,7 +184,7 @@
                         {% endif %}
                         <br>
 
-                        <label for="{{ form.nds.id_for_label }}">{{ form.nds.label }} {% if form.nds %}<span style="color:red;">*</span>{% endif %}</label>
+                        <label for="{{ form.nds.id_for_label }}">{{ form.vat_rate.label }} {% if form.vat_rate|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.nds }}
                         <br>
 
@@ -264,35 +193,12 @@
                         {% endif %}
                         <br>
 
-                        <label for="{{ form.is_stamp.id_for_label }}" style="font-weight: 700; color: red; font-size: 18px;">{{ form.is_stamp.label }} {% if form.is_stamp %}<span style="color:red;">*</span>{% endif %}</label>
+                        <label for="{{ form.is_stamp.id_for_label }}" style="font-weight: 700; color: red; font-size: 18px;">{{ form.is_stamp.label }} {% if form.is_stamp|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.is_stamp }}
 
                         {% if form.is_stamp.help_text %}
                             <small class="form-text text-muted">{{ form.is_stamp.help_text }}</small>
                         {% endif %}
-
-<!--                        {% if field.name == "organization" or field.name == "counterparty" or field.name == "consignee" or field.name == "bank_organization" %}-->
-<!--                            <div class="mt-2">-->
-<!--                                {% if field.name == "organization" %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#e91e63; color:red;" data-modal-type="organization">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить организацию-->
-<!--                                    </button>-->
-<!--                                {% elif field.name == "consignee" %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="consignee">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить грузополучателя-->
-<!--                                    </button>-->
-<!--                                {% elif field.name == "bank_organization" %}-->
-<!--                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addBankModal" style="border-color:#e91e63; color:red;">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить банк-->
-<!--                                    </button>-->
-<!--                                {% else %}-->
-<!--                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#e91e63; color:red;" data-modal-type="counterparty">-->
-<!--                                        <i class="fas fa-plus"></i> Добавить контрагента-->
-<!--                                    </button>-->
-<!--                                {% endif %}-->
-<!--                            </div>-->
-<!--                        {% endif %}-->
-                    </div>
                     </div>
                 </div>
             </div>
@@ -384,12 +290,14 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addOrganizationModalLabel">Добавить организацию и банковские реквизиты</h5>
+                    <h5 class="modal-title" id="addOrganizationModalLabel">Добавить организацию</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="organizationForm" method="post" action="">
+                    <form id="organizationForm" method="post" action="{% url 'add_organization' %}">
                         {% csrf_token %}
+                        <input type="hidden" id="modal-prefix" name="modal-prefix" value="organization">
+                        <input type="hidden" id="id_organization-id" name="modal-organization-id" value="">
                         <h5>Информация о организации</h5>
                         <div class="row">
                         {% for field in org_form %}
@@ -400,27 +308,6 @@
                                 <button type="button" class="btn btn-primary" id="findByINN" style="background-color:#e91e63;">Найти</button>
                             </div>
                             <div id="innSuggestions" class="dropdown-menu"></div>
-                            {% else %}
-                            {{ field }}
-                            <label class="form-label">{{ field.label }}</label>
-                            {% if field.help_text %}
-                            <small class="form-text text-muted">{{ field.help_text }}</small>
-                            {% endif %}
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-                        </div>
-                        <hr>
-                        <h5>Банковские реквизиты</h5>
-                        <div class="row">
-                        {% for field in bank_form %}
-                        <div class="col-md-6 mb-3 form-floating">
-                            {% if field.name == 'bic'%}
-                            <div class="input-group">
-                                {{ field }}
-                                <button type="button" class="btn btn-primary" id="findByBIK" style="background-color:#e91e63;">Найти</button>
-                            </div>
-                            <div id="bicSuggestions" class="dropdown-menu"></div>
                             {% else %}
                             {{ field }}
                             <label class="form-label">{{ field.label }}</label>
@@ -442,66 +329,93 @@
     </div>
 
    <!-- Modal для добавления контрагента -->
-   <div class="modal fade" id="addCounterpartyModal" tabindex="-1" aria-labelledby="addCounterpartyModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCounterpartyModalLabel">Добавить контрагента и банковские реквизиты</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="counterpartyForm" method="post" action="">
-                        {% csrf_token %}
-                        <h5>Информация о контрагенте</h5>
-                        <div class="row">
-                        {% for field in counterparty_form %}
-                        <div class="col-md-6 mb-3 form-floating">
-                            {% if field.name == 'inn'%}
-                            <div class="input-group">
-                                {{ field }}
-                                <button type="button" class="btn btn-primary" id="findByINNCounterparty" style="background-color:#e91e63;">Найти</button>
-                            </div>
-                            <div id="innSuggestionsCounterparty" class="dropdown-menu"></div>
-                            {% else %}
-                            {{ field }}
-                            <label class="form-label">{{ field.label }}</label>
-                            {% if field.help_text %}
-                            <small class="form-text text-muted">{{ field.help_text }}</small>
-                            {% endif %}
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-                        </div>
-                        <hr>
-                        <h5>Банковские реквизиты</h5>
-                        <div class="row">
-                        {% for field in counterparty_bank_form %}
-                        <div class="col-md-6 mb-3 form-floating">
-                            {% if field.name == 'bic'%}
-                            <div class="input-group">
-                                {{ field }}
-                                <button type="button" class="btn btn-primary" id="findByBIKCounterparty" style="background-color:#e91e63;">Найти</button>
-                            </div>
-                            <div id="bicSuggestionsCounterparty" class="dropdown-menu"></div>
-                            {% else %}
-                            {{ field }}
-                            <label class="form-label">{{ field.label }}</label>
-                            {% if field.help_text %}
-                            <small class="form-text text-muted">{{ field.help_text }}</small>
-                            {% endif %}
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-                        </div>
-                        <div class="text-left mt-3">
-                            <input type="hidden" name="modal_type_consignee" id="modal_type_consignee">
-                            <button type="submit" class="btn btn-success">Сохранить</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+</div>
+<div class="modal fade" id="addCounterpartyModal" tabindex="-1" aria-labelledby="addCounterpartyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="addCounterpartyModalLabel">Добавить контрагента</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form id="counterpartyForm" method="post" action="{% url 'add_organization' %}">
+                  {% csrf_token %}
+                  <input type="hidden" id="modal-prefix" name="modal-prefix" value="counterparty">
+                  <input type="hidden" id="id_counterparty-id" name="modal-counterparty-id" value="">
+                  <h5>Информация о контрагенте</h5>
+                  <div class="row">
+                  {% for field in counterparty_form %}
+                  <div class="col-md-6 mb-3 form-floating">
+                      {% if field.name == 'inn'%}
+                      <div class="input-group">
+                          {{ field }}
+                          <button type="button" class="btn btn-primary" id="findByINN" style="background-color:#e91e63;">Найти</button>
+                      </div>
+                      <div id="innSuggestions" class="dropdown-menu"></div>
+                      {% else %}
+                      {{ field }}
+                      <label class="form-label">{{ field.label }}</label>
+                      {% if field.help_text %}
+                      <small class="form-text text-muted">{{ field.help_text }}</small>
+                      {% endif %}
+                      {% endif %}
+                  </div>
+                  {% endfor %}
+                  </div>
+                  <div class="text-left mt-3">
+                      <input type="hidden" name="modal_type" id="modal_type">
+                      <button type="submit" class="btn btn-success">Сохранить</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Modal для добавления грузополучателя -->
+</div>
+<div class="modal fade" id="addConsigneeModal" tabindex="-1" aria-labelledby="addConsigneeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="addConsigneeModalLabel">Добавить грузополучателя</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form id="consigneeForm" method="post" action="{% url 'add_organization' %}">
+                  {% csrf_token %}
+                  <input type="hidden" id="modal-prefix" name="modal-prefix" value="consignee">
+                  <input type="hidden" id="cd_Consignee-id" name="modal-consignee-id" value="">
+                  <h5>Информация о грузополучателе</h5>
+                  <div class="row">
+                  {% for field in consignee_form %}
+                  <div class="col-md-6 mb-3 form-floating">
+                      {% if field.name == 'inn'%}
+                      <div class="input-group">
+                          {{ field }}
+                          <button type="button" class="btn btn-primary" id="findByINN" style="background-color:#e91e63;">Найти</button>
+                      </div>
+                      <div id="innSuggestions" class="dropdown-menu"></div>
+                      {% else %}
+                      {{ field }}
+                      <label class="form-label">{{ field.label }}</label>
+                      {% if field.help_text %}
+                      <small class="form-text text-muted">{{ field.help_text }}</small>
+                      {% endif %}
+                      {% endif %}
+                  </div>
+                  {% endfor %}
+                  </div>
+                  <div class="text-left mt-3">
+                      <input type="hidden" name="modal_type" id="modal_type">
+                      <button type="submit" class="btn btn-success">Сохранить</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
 
       <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -511,15 +425,15 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="bankForm" method="post" action="{% url 'add_bank_org' %}">
+                    <form id="bankForm" method="post" action="{% url 'add_bank_organization' %}">
                         {% csrf_token %}
                         <h5>Банковские реквизиты</h5>
                         <div class="row">
                         {% for field in bank_org %}
                         <div class="col-md-6 mb-3 form-floating">
-                            {% if field.name == 'bic'%}
+                            {% if field.name == 'bik'%}
                             <div class="input-group">
-                                {{ field }}
+                                {{ field|add_attr:"required=true" }}
                                 <button type="button" class="btn btn-primary" id="findByBIKBank" style="background-color:#e91e63;">Найти</button>
                             </div>
                             <div id="bicSuggestionsBank" class="dropdown-menu"></div>
@@ -550,20 +464,20 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="bankCounForm" method="post" action="{% url 'add_bank_coun' %}">
+                    <form id="bankCounForm" method="post" action="{% url 'add_bank_organization' %}">
                         {% csrf_token %}
                         <h5>Банковские реквизиты</h5>
                         <div class="row">
                         {% for field in bank_coun %}
                         <div class="col-md-6 mb-3 form-floating">
-                            {% if field.name == 'bic'%}
+                            {% if field.name == 'bik'%}
                             <div class="input-group">
-                                {{ field }}
+                                {{ field|add_attr:"required=true" }}
                                 <button type="button" class="btn btn-primary" id="findByBIKBankCoun" style="background-color:#e91e63;">Найти</button>
                             </div>
                             <div id="bicSuggestionsBankCoun" class="dropdown-menu"></div>
                             {% else %}
-                            {{ field }}
+                            {{ field|add_attr:"required=true" }}
                             <label class="form-label">{{ field.label }}</label>
                             {% if field.help_text %}
                             <small class="form-text text-muted">{{ field.help_text }}</small>
@@ -589,7 +503,8 @@
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="{% static 'js/material-dashboard.min.js' %}"></script>
-    {% endblock %}
+</body>
+{% endblock %}
 {% block scripts %}
 <script>
     function setDownloadExcel() {

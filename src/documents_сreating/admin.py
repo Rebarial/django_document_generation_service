@@ -3,7 +3,9 @@ from .models import (
     Organization, DocumentUPD, PaymentDocument, 
     ShipmentDocument, UPDItem, VatRate, 
     Currency, DocumentType, SellerStatus,
-    DocumentInvoiceForPayment, InvoiceForPaymentItem
+    DocumentInvoiceForPayment, InvoiceForPaymentItem,
+    BankDetails, Status,
+    StatusOrganization,
 )
 
 class PaymentDocumentInline(admin.TabularInline):
@@ -39,9 +41,31 @@ class InvoiceForPaymentItemInLine(admin.TabularInline):
 class DocumentInvoiceForPayment(admin.ModelAdmin):
     inlines = [InvoiceForPaymentItemInLine]
 
+class StatusOrganizationInline(admin.TabularInline):
+    model = StatusOrganization
+    extra = 0
+    fields = ('organization', 'status')
 
-admin.site.register(Organization)
+@admin.register(Organization)
+class OrganizationAdmin(admin.ModelAdmin):
+    list_display = ('name', 'inn', 'address')
+    search_fields = ('name', 'inn', 'address')
+    inlines = [
+        StatusOrganizationInline,
+    ]
+
+#admin.site.register(Organization)
 admin.site.register(VatRate)
 admin.site.register(Currency)
 admin.site.register(DocumentType)
 admin.site.register(SellerStatus)
+admin.site.register(Status)
+admin.site.register(StatusOrganization)
+admin.site.register(BankDetails)
+"""
+admin.site.register(Seller)
+admin.site.register(Buyer)
+admin.site.register(Consignee)
+admin.site.register(Consignor)
+
+"""

@@ -50,12 +50,14 @@ class BaseExcelDocumentCreate(ABC):
                 for item in offset:
                     if item["cell_itmes_number"] < cell_itmes_number:
                         sum_offset += item["offset"]
-
-                offset_local = self.add_document_itmes(sheet, list(getattr(document,item_data["items_model_name"]).all().values()), cell_itmes_number+sum_offset, item_data["items_content"]) #Количество строк товаров
-                offset.append({
-                    "cell_itmes_number": cell_itmes_number,
-                    "offset": offset_local
-                })
+                        
+                items_list = list(getattr(document,item_data["items_model_name"]).all().values())
+                if items_list:
+                    offset_local = self.add_document_itmes(sheet, list(getattr(document,item_data["items_model_name"]).all().values()), cell_itmes_number+sum_offset, item_data["items_content"]) #Количество строк товаров
+                    offset.append({
+                        "cell_itmes_number": cell_itmes_number,
+                        "offset": offset_local
+                    })
 
         if "Images" in self.document_dict:
 

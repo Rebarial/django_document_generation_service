@@ -19,6 +19,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+INTERNAL_IPS = ['127.0.0.1']
 
 # Application definition
 
@@ -26,6 +27,8 @@ INSTALLED_APPS = [
     'users',
     'invoice',
     'utd',
+
+    'debug_toolbar',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,6 +42,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -135,4 +140,4 @@ MEDIA_URL = '/media/'
 # Путь хранения картинок
 MEDIA_ROOT = BASE_DIR / 'media'
 
-LOGIN_URL = '/login/'
+LOGIN_URL = '/users/login/'

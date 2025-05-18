@@ -127,33 +127,33 @@ $(document).ready(function () {
         fetch(`/find-company/?inn=${inn}`)
         .then(response => response.json())
         .then(data => {
-            document.getElementById("id_organization-naming").value = "";
+            document.getElementById("id_organization-name").value = "";
             document.getElementById("id_organization-kpp").value = "";
             document.getElementById("id_organization-ogrn").value = "";
             document.getElementById("id_organization-address").value = "";
-            document.getElementById("id_organization-position_at_work").value = "";
-            document.getElementById("id_organization-supervisor").value = "";
+            document.getElementById("id_organization-director-position").value = "";
+            document.getElementById("id_organization-director-name").value = "";
             if (data.success) {
                 if (data.type == 'Юридическое лицо') {
-                    document.getElementById("id_organization-naming").value = data.name;
+                    document.getElementById("id_organization-name").value = data.name;
                     document.getElementById("id_organization-kpp").value = data.kpp;
                     document.getElementById("id_organization-ogrn").value = data.ogrn;
                     document.getElementById("id_organization-address").value = data.address;
-                    document.getElementById("id_organization-position_at_work").value = data.position_at_work;
-                    document.getElementById("id_organization-supervisor").value = data.supervisor;
+                    document.getElementById("id_organization-director-position").value = data.position_at_work;
+                    document.getElementById("id_organization-director-name").value = data.supervisor;
                     const type_selection = document.getElementById("type_selection");
-                    if (type_selection) {
-                        document.getElementById("type_selection").value = "ogrn";
-                    }
+                    //if (type_selection) {
+                    //    document.getElementById("type_selection").value = "ogrn";
+                    //}
                 }
                 else {
-                    document.getElementById("id_organization-naming").value = data.name;
+                    document.getElementById("id_organization-name").value = data.name;
                     document.getElementById("id_organization-ogrn").value = data.ogrn;
                     document.getElementById("id_organization-address").value = data.address;
-                    const type_selection = document.getElementById("type_selection");
-                    if (type_selection) {
-                        document.getElementById("type_selection").value = "ogrnip";
-                    }
+                    //const type_selection = document.getElementById("type_selection");
+                    //if (type_selection) {
+                    //    document.getElementById("type_selection").value = "ogrnip";
+                    //}
                 }
 
             } else {
@@ -250,16 +250,120 @@ $(document).ready(function () {
     });
 });
 
-$(document).ready(function () {
-    $('#addOrganizationModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var modalType = button.data('modal-type');
+function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id) {
+    $(modalSelector).on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget),
+            modalType = button.data('modal-type'),
+            selectedOrgID = $(orgIdInputSelector).val(),
+            form = $(this).find('form');
+        
 
-        var form = $(this).find('form');
-        form.find('#modal_type').val(modalType);
-    });
+        if (!selectedOrgID){
+            form.find(prefix + '-id').val('');
+            form.find(prefix + '-name').val('');
+            form.find(prefix + '-inn').val('');
+            form.find(prefix + '-kpp').val('');
+            form.find(prefix + '-is_ip')[0].checked = false;
+            form.find(prefix + '-ogrn').val('');
+            form.find(prefix + '-address').val('');
+            form.find(prefix + '-telephone').val('');
+            form.find(prefix + '-fax').val('');
+            form.find(prefix + '-director_name').val('');
+            form.find(prefix + '-director_position').val('');
+            form.find(prefix + '-accountant_name').val('');
+            form.find(prefix + '-conventional_name').val('');
+
+            form.find(`${prefix}-statuses input[type="checkbox"]`).each(function() {
+                const value = Number($(this).val()); 
+
+                if (default_id == value) {
+                    this.checked = true;
+                } else {
+                    this.checked = false;
+                }
+            });
+            form.find('#modal_type').val(modalType);
+            return
+        }
+        // Выполнение AJAX-запроса для получения данных
+        $.ajax({
+            url: '/fetch_organization_data',
+            type: 'GET',
+            data: {'org_id': selectedOrgID},
+            success: function(response) {
+                // Заполняем поля формы значениями из API
+                form.find(prefix + '-id').val(response.id);
+                form.find(prefix + '-name').val(response.name);
+                form.find(prefix + '-inn').val(response.inn);
+                form.find(prefix + '-kpp').val(response.kpp);
+                form.find(prefix + '-is_ip')[0].checked = response.is_ip;
+                form.find(prefix + '-ogrn').val(response.ogrn);
+                form.find(prefix + '-address').val(response.address);
+                form.find(prefix + '-telephone').val(response.telephone);
+                form.find(prefix + '-fax').val(response.fax);
+                form.find(prefix + '-director_name').val(response.director_name);
+                form.find(prefix + '-director_position').val(response.director_position);
+                form.find(prefix + '-accountant_name').val(response.accountant_name);
+                form.find(prefix + '-conventional_name').val(response.conventional_name);
+
+                const selectedStatuses = response.statuses || [];
+                form.find(`${prefix}-statuses input[type="checkbox"]`).each(function() {
+                    const value = Number($(this).val()); 
+                    //const value = $(this).val();
+                    console.log(value)
+                    console.log(selectedStatuses.includes(value))
+                    // Проверяем, находится ли значение среди выбранных сервером
+                    if (selectedStatuses.includes(value)) {
+                        this.checked = true;
+                    } else {
+                        this.checked = false;
+                    }
+                });
+
+            },
+            error: function() {
+                form.find(prefix + '-id').val('');
+                form.find(prefix + '-name').val('');
+                form.find(prefix + '-inn').val('');
+                form.find(prefix + '-kpp').val('');
+                form.find(prefix + '-is_ip')[0].checked = false;
+                form.find(prefix + '-ogrn').val('');
+                form.find(prefix + '-address').val('');
+                form.find(prefix + '-telephone').val('');
+                form.find(prefix + '-fax').val('');
+                form.find(prefix + '-director_name').val('');
+                form.find(prefix + '-director_position').val('');
+                form.find(prefix + '-accountant_name').val('');
+                form.find(prefix + '-conventional_name').val('');
+                let statusesCheckboxes = $('input[name="' + prefix + '_statuses[]"]');
+
+                form.find(`${prefix}-statuses input[type="checkbox"]`).each(function() {
+                    const value = Number($(this).val()); 
+    
+                    if (default_id == value) {
+                        this.checked = true;
+                    } else {
+                        this.checked = false;
+                    }
+                });
+                statusesCheckboxes.prop('checked', false)
+            }
+        });
+    form.find('#modal_type').val(modalType);
+    }
+    );
+
+};
+
+$(document).ready(function () {
+    handleModalEvent('#addOrganizationModal', '#id_organization', '#id_organization', 1);
 });
 
+$(document).ready(function () {
+    handleModalEvent('#addCounterpartyModal', '#id_counterparty', '#id_counterparty', 2);
+});
+
+//Вставка строки
 document.getElementById('organizationForm').addEventListener('submit', function (e) {
     e.preventDefault();
     const formData = new FormData(this);
@@ -275,19 +379,32 @@ document.getElementById('organizationForm').addEventListener('submit', function 
     .then(response => response.json())
     .then(data => {
         if (data.errors) {
-            alert('Ошибка: ' + JSON.stringify(data.errors));
+            alert('Ошибка:' + JSON.stringify(data.errors));
         } else {
             document.querySelector('#addOrganizationModal .btn-close').click();
 
             if (modalType === 'organization') {
-                const select = document.getElementById('id_organization');
-                const option = new Option(data.name, data.id, true, true);
-                select.add(option);
+                if (document.getElementById("id_organization-id").value == ""){
+                    const select = document.getElementById('id_organization');
+                    const option = new Option(data.name, data.id, true, true);
+                    select.add(option);
 
-                const select_bank = document.getElementById('id_bank_organization');
-                if (select_bank) {
-                    const option_bank = new Option(data.bank_name, data.bank_id, true, true);
-                    select_bank.add(option_bank);
+                    //const select_bank = document.getElementById('id_bank_organization');
+                    //if (select_bank) {
+                    //    const option_bank = new Option(data.bank_name, data.bank_id, true, true);
+                    //   select_bank.add(option_bank);
+                    //}
+                }
+                else
+                {
+                    const select = document.getElementById('id_organization');
+    
+                    const selectedIndex = select.selectedIndex;
+                    const selectedOption = select.options[selectedIndex];
+                
+                    if (selectedOption) {
+                        selectedOption.textContent = data.name;
+                    }
                 }
             }
             else {const select = document.getElementById('id_shipper');
@@ -329,7 +446,7 @@ document.getElementById('counterpartyForm').addEventListener('submit', function 
     .then(response => response.json())
     .then(data => {
         if (data.errors) {
-            alert('Ошибка: ' + JSON.stringify(data.errors));
+            alert('Ошибка:' + JSON.stringify(data.errors));
         } else {
             document.querySelector('#addCounterpartyModal .btn-close').click();
 
@@ -809,7 +926,9 @@ $(document).ready(function () {
 
 document.getElementById("findByINN").addEventListener("click", function() {
     let innInput = document.getElementById("id_organization-inn");
+    console.log(innInput)
     let inn = innInput.value.trim();
+    console.log(inn)
 
     if (!inn) {
         alert("Введите ИНН");
@@ -819,33 +938,35 @@ document.getElementById("findByINN").addEventListener("click", function() {
     fetch(`/find-company/?inn=${inn}`)
         .then(response => response.json())
         .then(data => {
-            document.getElementById("id_organization-naming").value = "";
+            document.getElementById("id_organization-name").value = "";
             document.getElementById("id_organization-kpp").value = "";
             document.getElementById("id_organization-ogrn").value = "";
             document.getElementById("id_organization-address").value = "";
-            document.getElementById("id_organization-position_at_work").value = "";
-            document.getElementById("id_organization-supervisor").value = "";
+            document.getElementById("id_organization-director_position").value = "";
+            document.getElementById("id_organization-director_name").value = "";
             if (data.success) {
                 if (data.type == 'Юридическое лицо') {
-                    document.getElementById("id_organization-naming").value = data.name;
+                    document.getElementById("id_organization-name").value = data.name;
                     document.getElementById("id_organization-kpp").value = data.kpp;
                     document.getElementById("id_organization-ogrn").value = data.ogrn;
                     document.getElementById("id_organization-address").value = data.address;
-                    document.getElementById("id_organization-position_at_work").value = data.position_at_work;
-                    document.getElementById("id_organization-supervisor").value = data.supervisor;
-                    const type_selection = document.getElementById("type_selection");
-                    if (type_selection) {
-                        document.getElementById("type_selection").value = "ogrn";
-                    }
+                    document.getElementById("id_organization-director_position").value = data.position_at_work;
+                    document.getElementById("id_organization-director_name").value = data.supervisor;
+                    document.getElementById("id_organization-is_ip").checked = false;
+                    //const type_selection = document.getElementById("type_selection");
+                    //if (type_selection) {
+                    //    document.getElementById("type_selection").value = "ogrn";
+                    //}
                 }
                 else {
-                    document.getElementById("id_organization-naming").value = data.name;
+                    document.getElementById("id_organization-name").value = data.name;
                     document.getElementById("id_organization-ogrn").value = data.ogrn;
                     document.getElementById("id_organization-address").value = data.address;
-                    const type_selection = document.getElementById("type_selection");
-                    if (type_selection) {
-                        document.getElementById("type_selection").value = "ogrnip";
-                    }
+                    document.getElementById("id_organization-is_ip").checked = true;
+                    //const type_selection = document.getElementById("type_selection");
+                   // if (type_selection) {
+                    //    document.getElementById("type_selection").value = "ogrnip";
+                    //}
                 }
 
             } else {
