@@ -41,7 +41,7 @@ class InvoiceDocumentForm(forms.ModelForm):
         queryset=VatRate.objects,
         widget=forms.Select(attrs={'class': 'form-select select2'}),
         empty_label='Нет',
-        label='Валюта',
+        label='Ставка НДС',
         required=False
     )
 
@@ -57,7 +57,7 @@ class InvoiceDocumentForm(forms.ModelForm):
 
     buyer_status = Status.objects.filter(name="Buyer").first()
 
-    counterparty = forms.ModelChoiceField(
+    buyer = forms.ModelChoiceField(
         queryset=Organization.objects.filter(status_org__status=buyer_status).distinct(),
         widget=forms.Select(attrs={'class': 'form-select select2'}),
         empty_label='Новый контрагент',
@@ -80,7 +80,21 @@ class InvoiceDocumentForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-select select2'}),
         empty_label='Новый банк',
         label='Банк организации',
-        required=False
+        required=True
+    )
+
+    buyer_bank = forms.ModelChoiceField(
+        queryset=BankDetails.objects,
+        widget=forms.Select(attrs={'class': 'form-select select2'}),
+        empty_label='Новый банк',
+        label='Банк покупателя',
+        required=True
+    )
+
+    is_stamp = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        label='Добавить печать и подпись'
     )
 
     class Meta:
@@ -98,17 +112,24 @@ class InvoiceDocumentForm(forms.ModelForm):
             'customer_telephone': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Введите номер телефона', 'inputmode': 'tel',
                        'type': 'tel'}),
+            'is_stamp': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
         def __init__(self, *args, **kwargs):
             request = kwargs.pop('request', None)
             super().__init__(*args, **kwargs)
 
+            self.fields['organization_bank'].queryset = BankDetails.objects.none()
+            self.fields['buyer_bank'].queryset = BankDetails.objects.none()
+
             if request:
+                self.fields['organization_bank'].queryset = BankDetails.objects.none()
+                self.fields['buyer_bank'].queryset = BankDetails.objects.none()
                 self.fields['organization'].queryset = Organization.objects.filter(user=request.user)
                 self.fields['counterparty'].queryset = Organization.objects.filter(user=request.user)
                 self.fields['consignee'].queryset = Organization.objects.filter(user=request.user)
 
+                '''
                 organization_id = request.POST.get("organization") or request.GET.get("organization") or (
                     getattr(self.instance, "organization_id", None) if self.instance else None
                 )
@@ -122,6 +143,7 @@ class InvoiceDocumentForm(forms.ModelForm):
                 if counterparty_id:
                     self.fields['bank_counterparty'].queryset = Organization.objects.filter(
                         organization_id=counterparty_id)
+                '''
         
 class InvoiceDocumentTableForm(forms.ModelForm):
     class Meta:

@@ -26,6 +26,18 @@ class BaseExcelDocumentCreate(ABC):
         self.document_dict: dict = document_dict
         self.template_path: str = template_path
 
+    def get_nested_attribute(self, document, item):
+
+        try:
+            dk = document
+            for it in item.split("."):
+                dk = getattr(dk, it)
+            return dk
+        except:
+            print(item)
+            return None
+
+
     def inn_or_kpp(self, text: str) -> str:
         if ("inn_" in text or 
             "_inn" in text):
@@ -50,10 +62,10 @@ class BaseExcelDocumentCreate(ABC):
                 for item in offset:
                     if item["cell_itmes_number"] < cell_itmes_number:
                         sum_offset += item["offset"]
-                        
-                items_list = list(getattr(document,item_data["items_model_name"]).all().values())
+                
+                items_list = list(self.get_nested_attribute(document,item_data["items_model_name"]).all().values())
                 if items_list:
-                    offset_local = self.add_document_itmes(sheet, list(getattr(document,item_data["items_model_name"]).all().values()), cell_itmes_number+sum_offset, item_data["items_content"]) #Количество строк товаров
+                    offset_local = self.add_document_itmes(sheet, list(self.get_nested_attribute(document,item_data["items_model_name"]).all().values()), cell_itmes_number+sum_offset, item_data["items_content"]) #Количество строк товаров
                     offset.append({
                         "cell_itmes_number": cell_itmes_number,
                         "offset": offset_local
@@ -61,33 +73,33 @@ class BaseExcelDocumentCreate(ABC):
 
         if "Images" in self.document_dict:
 
-            organization = Organization.objects.filter(inn=getattr(document, inn_field)).first()
+            organization = Organization.objects.filter(inn=self.get_nested_attribute(document, inn_field)).first()
 
             #Добавление печати и подписи
             if organization:
                 for image in self.document_dict["Images"]:
-                    if hasattr(organization, image["type"]) and getattr(organization, image["type"]):
-                        self.add_image(sheet, getattr(organization, image["type"]).name, image["width"], image["height"], self.get_cell_ref(image["cell"], offset))
+                    if self.get_nested_attribute(organization, image["type"]):
+                        self.add_image(sheet, self.get_nested_attribute(organization, image["type"]).name, image["width"], image["height"], self.get_cell_ref(image["cell"], offset))
 
                 #!!Необходимо добавить заполнение КПП если ИНН отсутствует
         if "Concatenation" in self.document_dict:
             for key, cell_ref in self.document_dict["Concatenation"].items():
-                if hasattr(document, key) and getattr(document, key):
+                if self.get_nested_attribute(document, key):
                     cell = self.get_cell_ref(cell_ref, offset)
                     if sheet[cell].value != None:
-                        sheet[cell].value += f", {getattr(document, key)}"
+                        sheet[cell].value += f", {self.get_nested_attribute(document, key)}"
                         value = sheet[cell].value
                         self.row_height_from_content(sheet, value, cell)
                     else:
-                        sheet[cell] = str(getattr(document, key))
+                        sheet[cell] = str(self.get_nested_attribute(document, key))
                         value = sheet[cell].value
                         self.row_height_from_content(sheet, value, cell)
 
         #!!Необходимо добавить заполнение КПП если ИНН отсутствует
         if "Raw_data" in self.document_dict:
             for key, cell_ref in self.document_dict["Raw_data"].items():
-                if hasattr(document, key) and getattr(document, key):
-                    value = str(getattr(document, key))
+                if self.get_nested_attribute(document, key):
+                    value = str(self.get_nested_attribute(document, key))
                     inn_kpp = self.inn_or_kpp(value)
                     if inn_kpp == "inn":
                         value = "ИНН " + value
@@ -107,22 +119,22 @@ class BaseExcelDocumentCreate(ABC):
         if "Date" in self.document_dict:
             if "day" in self.document_dict["Date"]:
                 for key, cell_ref in self.document_dict["Date"]["day"].items():
-                    if hasattr(document, key) and getattr(document, key):
-                        sheet[self.get_cell_ref(cell_ref, offset)] = str(getattr(document, key).day)
+                    if self.get_nested_attribute(document, key):
+                        sheet[self.get_cell_ref(cell_ref, offset)] = str(self.get_nested_attribute(document, key).day)
             if "month" in self.document_dict["Date"]:
                 for key, cell_ref in self.document_dict["Date"]["month"].items():
-                    if hasattr(document, key) and getattr(document, key):
-                        sheet[self.get_cell_ref(cell_ref, offset)] = str(getattr(document, key).strftime('%B'))
+                    if self.get_nested_attribute(document, key):
+                        sheet[self.get_cell_ref(cell_ref, offset)] = str(self.get_nested_attribute(document, key).strftime('%B'))
 
             if "year" in self.document_dict["Date"]:
                 for key, cell_ref in self.document_dict["Date"]["year"].items():
-                    if hasattr(document, key) and getattr(document, key):
-                        sheet[self.get_cell_ref(cell_ref, offset)] = str(getattr(document, key).year)
+                    if self.get_nested_attribute(document, key):
+                        sheet[self.get_cell_ref(cell_ref, offset)] = str(self.get_nested_attribute(document, key).year)
 
             if "fromat" in self.document_dict["Date"]:
                 for key, cell_ref in self.document_dict["Date"]["fromat"].items():
-                    if hasattr(document, key) and getattr(document, key):
-                        sheet[self.get_cell_ref(cell_ref, offset)] = f'"{getattr(document, key).day}" {getattr(document, key).strftime("%B %Y г.")}'
+                    if self.get_nested_attribute(document, key):
+                        sheet[self.get_cell_ref(cell_ref, offset)] = f'"{self.get_nested_attribute(document, key).day}" {self.get_nested_attribute(document, key).strftime("%B %Y г.")}'
 
 
     @abstractmethod

@@ -69,47 +69,6 @@ def profile(request):
 
 
 def find_company_by_inn(request):
-    # inn = request.GET.get("inn")
-    # if not inn:
-    #     return JsonResponse({"success": False, "error": "ИНН не указан"}, status=400)
-    #
-    # fns_url = f"https://api-fns.ru/api/egr?req={inn}&key=0e1ed851511ec34bdc069ef66f1278e6495d646a"
-    # response = requests.get(fns_url)
-    #
-    # if response.status_code == 200:
-    #     data = response.json()
-    #     if "items" in data:
-    #         company_data = data["items"][0]
-    #
-    #         if "ЮЛ" in company_data:
-    #             company = company_data["ЮЛ"]
-    #             return JsonResponse({
-    #                 "success": True,
-    #                 "type": "Юридическое лицо",
-    #                 "name": company.get("НаимСокрЮЛ", ""),
-    #                 "kpp": company.get("КПП", ""),
-    #                 "ogrn": company.get("ОГРН", ""),
-    #                 "address": company.get("Адрес", {}).get("АдресПолн", ""),
-    #                 "position_at_work": company.get("Руководитель", {}).get("Должн", ""),
-    #                 "supervisor": company.get("Руководитель", {}).get("ФИОПолн", ""),
-    #             })
-    #
-    #         elif "ИП" in company_data:
-    #             company = company_data["ИП"]
-    #             address = company.get("Адрес", "")
-    #             if address:
-    #                 address_all = address.get("АдресПолн", "")
-    #             else:
-    #                 address_all = address
-    #             return JsonResponse({
-    #                 "success": True,
-    #                 "type": "Индивидуальный предприниматель",
-    #                 "name": company.get("ФИОПолн", ""),
-    #                 "ogrn": company.get("ОГРНИП", ""),
-    #                 "address": address_all,
-    #             })
-    #
-    # return JsonResponse({"success": False, "error": "Компания или ИП не найдены"}, status=404)
 
     inn = request.GET.get("inn")
 

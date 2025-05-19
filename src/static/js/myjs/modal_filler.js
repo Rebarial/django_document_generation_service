@@ -4,7 +4,6 @@ function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id)
             modalType = button.data('modal-type'),
             selectedOrgID = $(orgIdInputSelector).val(),
             form = $(this).find('form');
-
         if (!selectedOrgID){
             form.find(prefix + '-id').val('');
             form.find(prefix + '-name').val('');
@@ -101,11 +100,11 @@ function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id)
 };
 
 $(document).ready(function () {
-    handleModalEvent('#addOrganizationModal', '#id_organization', '#id_organization', 1);
+    handleModalEvent('#addOrganizationModal', '#id_organization', '#id_seller', 1);
 });
 
 $(document).ready(function () {
-    handleModalEvent('#addCounterpartyModal', '#id_counterparty', '#id_counterparty', 2);
+    handleModalEvent('#addCounterpartyModal', '#id_buyer', '#id_buyer', 2);
 });
 
 $(document).ready(function () {

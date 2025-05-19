@@ -10,7 +10,12 @@ class InvoiceForPaymentExcelDocumentCreate(BaseExcelDocumentCreate):
     def __init__(self, document_dict: dict, template_path: str):
         super().__init__(document_dict, template_path)
 
+
     def create_excel_document(self, document: BaseModel, converter: Callable) -> BytesIO:
+
+        print(type(document))
+        print(vars(document))
+        print(vars(document.organization))
 
         if not converter:
             converter = self.toPDF_libre
@@ -22,18 +27,21 @@ class InvoiceForPaymentExcelDocumentCreate(BaseExcelDocumentCreate):
         if "document_name" in self.document_dict["Custom_data"]:
 
             number = self.document_dict["Custom_data"]["document_name"]["number"]
-            if hasattr(document, number) and getattr(document, number):
-                sheet[self.get_cell_ref(self.document_dict["Custom_data"]["document_name"]["cell"], offset)].value += getattr(document, number)
+            if hasattr(document, number) and self.get_nested_attribute(document, number):
+                sheet[self.get_cell_ref(self.document_dict["Custom_data"]["document_name"]["cell"], offset)].value += self.get_nested_attribute(document, number)
 
             date = self.document_dict["Custom_data"]["document_name"]["date"]
-            if hasattr(document, date) and getattr(document, date):
-                sheet[self.get_cell_ref(self.document_dict["Custom_data"]["document_name"]["cell"], offset)].value += f' от {getattr(document, date).day}" {getattr(document, date).strftime("%B %Y г.")}'
+            if hasattr(document, date) and self.get_nested_attribute(document, date):
+                sheet[self.get_cell_ref(self.document_dict["Custom_data"]["document_name"]["cell"], offset)].value += f' от {self.get_nested_attribute(document, date).day}" {self.get_nested_attribute(document, date).strftime("%B %Y г.")}'
 
-            
+        print()            
 
         invoice_organization_info_dict_value = []
         for item in self.document_dict["Custom_data"]["invoice_organization_info_value"]:
-            invoice_organization_info_dict_value.append({"info": str(getattr(document, item))})
+            val = self.get_nested_attribute(document, item)
+            if val:
+                #print(self.get_nested_attribute(document, 'organization'))
+                invoice_organization_info_dict_value.append({"info": str(val)})
 
         offset.append({
                 "cell_itmes_number": self.document_dict["Custom_data"]["invoice_organization_info_cell_number"],

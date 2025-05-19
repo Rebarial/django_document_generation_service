@@ -2,8 +2,9 @@
 function addRowDropLine(formId, modalId, prefix) {
     document.getElementById(formId).addEventListener('submit', function(e) {
         e.preventDefault();
-        
+        selectId = 'id_' + prefix;
         const formData = new FormData(this);
+        formData.append('org_id', document.getElementById(selectId).value);
         const modalType = document.getElementById('modal_type').value;
         
         fetch(this.action, {
@@ -18,7 +19,7 @@ function addRowDropLine(formId, modalId, prefix) {
             } else {
                 document.querySelector(modalId + ' .btn-close').click();
 
-                selectId = 'id_' + prefix;
+                
 
                 const select = document.getElementById(selectId);
                 const selectedIndex = select.selectedIndex;
@@ -34,15 +35,15 @@ function addRowDropLine(formId, modalId, prefix) {
                     select.add(option);
                 }
 
-                 //Добавить обход всех dropline
             }
         }).catch(error => console.error('Ошибка:', error));
     });
 }
 
 addRowDropLine('organizationForm', '#addOrganizationModal', 'organization')
-addRowDropLine('counterpartyForm', '#addCounterpartyModal', 'counterparty')
+addRowDropLine('counterpartyForm', '#addCounterpartyModal', 'buyer')
 addRowDropLine('consigneeForm', '#addConsigneeModal', 'consignee')
+
 
 /*
 document.getElementById('counterpartyForm').addEventListener('submit', function (e) {

@@ -48,8 +48,3 @@ class DocumentInvoiceForPayment(BaseDocument):
     class Meta:
         verbose_name = 'Счет на оплату'
         verbose_name_plural = 'Счет на оплату'
-    
-    
-    
-    
-    

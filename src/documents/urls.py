@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from utd.views import UtdDocumentCreateView
 from django.conf import settings
-from invoice.views import add_organization, fetch_organization_data
+from invoice.views import add_organization, fetch_organization_data, fetch_organization_bank_data, fetch_bank_from_organization
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -11,7 +11,9 @@ urlpatterns = [
     path('', include('invoice.urls')),
     path('utd/', UtdDocumentCreateView.as_view(), name='utd'),
     path('add-organization/', add_organization, name='add_organization'),
-    path('fetch_organization_data', fetch_organization_data, name='fetch_organization_data')
+    path('fetch_organization_data/', fetch_organization_data, name='fetch_organization_data'),
+    path('fetch_organization_bank_data/', fetch_organization_bank_data, name='fetch_organization_bank_data'),
+    path('fetch_bank_from_organization/', fetch_bank_from_organization, name='fetch_bank_from_organization'),
 ]
 
 

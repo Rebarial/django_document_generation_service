@@ -3,29 +3,29 @@ invoice_for_payment_dict = {
         19
     ],
     "Raw_data": {
-        "organization_name" : [("A", 5), ("A", 7)],
-        "customer_name" : ("AY", 7),
+        "organization.name" : [("A", 5), ("A", 7)],
+        "buyer.name" : ("AY", 7),
         "purpose_of_payment" : ("A", 15),
-        "organization_director_name" : ("AI", 20),
-        "organization_director_position": ("A", 20),
-        "organization_accountant_name": ("AI", 22)
+        "organization.director_name" : ("AI", 20),
+        "organization.director_position": ("A", 20),
+        "organization.accountant_name": ("AI", 22)
     },
     "Concatenation": {
-        "organization_address": ("A", 8),
-        "organization_inn": ("A", 8),
-        "organization_main_state_number": ("A", 8),
-        "organization_bank_name": ("A", 8),
-        "organization_bank_place_of_registration": ("A", 8),
-        "organization_correspondent_account": ("A", 8),
-        "organization_bik": ("A", 8),
+        "organization.address": ("A", 8),
+        "organization.inn": ("A", 8),
+        "organization.ogrn": ("A", 8),
+        "organization_bank.name": ("A", 8),
+        "organization_bank.address": ("A", 8),
+        "organization_bank.correspondent_account": ("A", 8),
+        "organization_bank.bik": ("A", 8),
 
-        "customer_address": ("AY", 8),
-        "customer_inn": ("AY", 8),
-        "customer_main_state_number": ("AY", 8),
-        "customer_bank_name": ("AY", 8),
-        "customer_place_of_registration": ("AY", 8),
-        "customer_correspondent_account": ("AY", 8),
-        "customer_bik": ("A", 8),
+        "buyer.address": ("AY", 8),
+        "buyer.inn": ("AY", 8),
+        "buyer.ogrn": ("AY", 8),
+        "buyer_bank.name": ("AY", 8),
+        "buyer_bank.address": ("AY", 8),
+        "buyer_bank.correspondent_account": ("AY", 8),
+        "buyer_bank.bik": ("A", 8),
     },
     "Images":[
         {
@@ -58,21 +58,21 @@ invoice_for_payment_dict = {
     ),
     "Custom_data" :
     {
-        "inn_field": "organization_inn",
+        "inn_field": "organization.inn",
         "invoice_organization_info_cell_number": 1,
         "invoice_organization_info_items":{
             "info": "A",
         },
         "invoice_organization_info_value":(
-            "organization_name", 
-            "organization_address",
-            "organization_inn",
-            "organization_main_state_number",
+            "organization.name", 
+            "organization.address",
+            "organization.inn",
+            "organization.ogrn",
         ),
         "document_name": {
             "cell": ("A", 10),
-            "number": "invoice_for_payment_number",
-            "date": "invoice_for_payment_data"
+            "number": "number",
+            "date": "date"
         }
     }
 }
