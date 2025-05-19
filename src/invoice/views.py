@@ -29,37 +29,40 @@ class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
     #template_name = 'test.html'
 
     #success_url = reverse_lazy('invoices_list')
-    success_url = reverse_lazy('main')
+    success_url = reverse_lazy('invoice_edit')#, kwargs={'id_doc': object.attrs})
 
     def get_object(self, queryset=None):
         """Получение текущего объекта по переданному id_doc"""
         obj = None
         id_doc = self.kwargs.get('id_doc')
-        if id_doc is not None:
+        if not id_doc:
+            id_doc = self.kwargs.get('id')
+        if id_doc:
             obj = get_object_or_404(DocumentInvoiceForPayment, pk=id_doc)
         return obj
 
     def get_initial(self):
         initial = super().get_initial()
         object = self.get_object()
-        initial.update({
-            'number': object.number,
-            'date': object.date,
-            'organization': object.organization.pk if object.organization else None,
-            'organization_bank': object.organization_bank.pk if object.organization_bank else None,
-            'buyer': object.buyer.pk if object.buyer else None,
-            'buyer_bank': object.buyer_bank.pk if object.buyer_bank else None,
-            'consignee': object.consignee.pk if object.consignee else None,
-            'purpose_of_payment': object.purpose_of_payment,
-            'payment_for': object.payment_for,
-            'agreement': object.agreement,
-            'vat_rate': object.vat_rate.pk if object.vat_rate else None,
-            'printed_form': object.printed_form,
-            'currency': object.currency.pk if object.currency else None,
-            'discount': object.discount,
-            'additional_info': object.additional_info,
-            'is_stamp': object.is_stamp,
-        })
+        if object:
+            initial.update({
+                'number': object.number,
+                'date': object.date,
+                'organization': object.organization.pk if object.organization else None,
+                'organization_bank': object.organization_bank.pk if object.organization_bank else None,
+                'buyer': object.buyer.pk if object.buyer else None,
+                'buyer_bank': object.buyer_bank.pk if object.buyer_bank else None,
+                'consignee': object.consignee.pk if object.consignee else None,
+                'purpose_of_payment': object.purpose_of_payment,
+                'payment_for': object.payment_for,
+                'agreement': object.agreement,
+                'vat_rate': object.vat_rate.pk if object.vat_rate else None,
+                'printed_form': object.printed_form,
+                'currency': object.currency.pk if object.currency else None,
+                'discount': object.discount,
+                'additional_info': object.additional_info,
+                'is_stamp': object.is_stamp,
+            })
         return initial
 
     vat_rate = VatRate.objects
@@ -83,9 +86,16 @@ class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
+
+        existing_obj = self.get_object()
+    
+        if existing_obj:
+            form.instance = existing_obj
+
         self.object = form.save(commit=False)
         self.object.user = self.request.user
-        self.object.save()
+    
+        self.success_url = reverse_lazy('invoice_edit', kwargs={'id_doc': self.object.id})
 
         formset = InvoiceDocumentTableFormSet(self.request.POST)
 
@@ -137,7 +147,8 @@ class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
                 response['Content-Disposition'] = f'attachment; filename=test UPD.pdf'
                 print(response)
                 return response
-
+                
+        self.object.save()
         #return "300"
         return super().form_valid(form)
 
