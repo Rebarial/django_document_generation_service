@@ -13,7 +13,7 @@ class VatRate(BaseModel):
         ordering = ['code']
     
     def __str__(self):
-        return f"{self.rate}"
+        return f"{self.name}"
 
 class Currency(BaseModel):
     code = models.CharField(max_length=3, verbose_name='Код')

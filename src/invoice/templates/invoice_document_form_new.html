@@ -199,7 +199,7 @@
 
                         <label for="{{ form.is_stamp.id_for_label }}" style="font-weight: 700; color: red; font-size: 18px;">{{ form.is_stamp.label }} {% if form.is_stamp|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         <br>
-                        <input class="form-check-input" type="checkbox" name="is_stamp" id="id_is_stamp">
+                        <input class="form-check-input" type="checkbox" name="is_stamp" id="id_is_stamp" checked="{{ form.is_stamp.value }}">
 
                         {% if form.is_stamp.help_text %}
                             <small class="form-text text-muted">{{ form.is_stamp.help_text }}</small>
@@ -246,7 +246,7 @@
                             <td>{{ form.unit }}</td>
                             <td class="quantity">{{ form.quantity }}</td>
                             <td class="price">{{ form.price }}</td>
-                            <td class="amount">{{ form.sum }}</td>
+                            <td class="amount">{{ form.sum|add_attr:"readonly=true" }}</td>
                             <td>
                                 <button type="button" class="btn  drag-handle" title="Перетащить">
                                     <i class="fas fa-arrows-alt"></i>
@@ -515,6 +515,9 @@
 </body>
 {% endblock %}
 {% block scripts %}
+<script>
+    var vatRatesDict = {{ vat_rates }};
+</script>
 <script>
     function setDownloadExcel() {
         document.getElementById('download_pdf').value = "false";

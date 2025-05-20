@@ -15,6 +15,7 @@ from documents_сreating.tools.work_with_excel.invoice_for_payment import invoic
 from django.http import HttpResponse
 from documents_сreating.models.organization import Organization, BankDetails, StatusOrganization, Status
 from documents_сreating.models.reference import VatRate
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 import json
 
@@ -29,7 +30,12 @@ class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
     #template_name = 'test.html'
 
     #success_url = reverse_lazy('invoices_list')
-    success_url = reverse_lazy('invoice_edit')#, kwargs={'id_doc': object.attrs})
+    success_url = reverse_lazy('invoice_document')#, kwargs={'id_doc': object.attrs})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request  # Добавляем request в kwargs формы
+        return kwargs
 
     def get_object(self, queryset=None):
         """Получение текущего объекта по переданному id_doc"""
@@ -70,12 +76,13 @@ class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        #seller_status = Status.objects.filter(name='Seller').first()
         context['org_form'] = OrganizationForm(prefix='seller')
         context['counterparty_form'] = OrganizationForm(prefix='buyer')
         context['consignee_form'] = OrganizationForm(prefix='consignee')
         context['bank_coun'] = BankDetailsOrganizationForm(prefix='buyer_bank')
         context['bank_org'] = BankDetailsOrganizationForm(prefix='organization_bank')
+        context['vat_rates'] = {v.id: float(v.rate) for v in VatRate.objects.filter(is_active=True)}
+        
         object = self.get_object()
         if object:
            context['formset'] = InvoiceDocumentTableFormSet(queryset=object.items_docs.all())
@@ -111,7 +118,7 @@ class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
         self.object.is_stamp = form.cleaned_data['is_stamp']
 
         self.object.save()
-        self.success_url = reverse_lazy('invoice_edit', kwargs={'id_doc': self.object.id})
+        #self.success_url = reverse_lazy('invoice_edit', kwargs={'id_doc': self.object.id})
 
         formset = InvoiceDocumentTableFormSet(self.request.POST)
 
@@ -160,6 +167,14 @@ class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
     def form_invalid(self, form):
         print("Form validation failed with errors:", form.errors.as_data())
         return super().form_invalid(form)
+
+def download_pdf(request, id_doc):
+    if id_doc:
+        document = DocumentInvoiceForPayment.objects.get(id = id_doc)
+        excel_document = invoice_for_payment_excel_document_create.create_excel_document(document, None)
+        response = HttpResponse(excel_document.read(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename=test UPD.pdf'
+        return response
 
 def add_organization(request):
     if request.method == 'POST':
@@ -332,7 +347,7 @@ def fetch_bank_from_organization(request):
         return JsonResponse({"error": "Метод не поддерживается"}, status=405)
     
 
-
+@login_required
 def invoice_document(request):
     query = request.GET.get('q', '')
     date_from = request.GET.get('date_from', '')
@@ -345,7 +360,6 @@ def invoice_document(request):
 
     if query:
         documents = documents.filter(number__icontains=query)
-
     if date_from:
         documents = documents.filter(date__gte=parse_date(date_from))
     if date_to:
@@ -366,9 +380,9 @@ def invoice_document(request):
         elif sort_param == 'date_document_old':
             documents = documents.order_by('date')
         elif sort_param == 'name_document_new':
-            documents = documents.order_by('name')
+            documents = documents.order_by('number')
         elif sort_param == 'name_document_old':
-            documents = documents.order_by('-name')
+            documents = documents.order_by('-number')
     else:
         documents = documents.order_by('-date')
 

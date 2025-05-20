@@ -149,7 +149,7 @@
                     <span class="mb-2 text-xs">Дата создания: <span class="text-dark font-weight-bold ms-sm-2">{{ document.date|date:"j E Y" }}</span></span>
                     <span class="mb-2 text-xs">Огранизация: <span class="text-dark ms-sm-2 font-weight-bold">{{ document.organization.name }}</span></span>
                     <span class="text-xs">Контрагент: <span class="text-dark ms-sm-2 font-weight-bold">{{ document.buyer.name }} (ИНН: {{ document.buyer.inn }})</span></span>
-                      <table class="table table-bordered document-table" style="margin-top: 35px;" id="table-{{ document.id }}" data-vat-rate="{{ document.nds }}">
+                      <table class="table table-bordered document-table" style="margin-top: 35px;" id="table-{{ document.id }}" data-vat-rate="{{ document.vat_rate }}">
                 <thead>
                     <tr>
                         <th style="width: 190px; min-width: 190px;">Наименование</th>
@@ -164,6 +164,7 @@
                               <td style="color: black;">{{ product.name }}</td>
                               <td style="color: black;" class="quantity">{{ product.quantity }}</td>
                               <td style="color: black;" class="price">{{ product.price }}</td>
+                              <td style="display: none;" class="discount">{{ document.discount }}</td>
                               <td style="color: black;" class="amount-cell">{{ product.sum }}</td>
                           </tr>
                           {% endfor %}
@@ -180,7 +181,7 @@
                           </tbody>
                     </table>
                        <div class="d-flex align-items-center" style="margin-top: 35px; gap: 20px;">
-                    <form method="POST" action="" class="d-flex align-items-center">
+                    <form method="POST" action="{% url 'download_document' document.id %}" class="d-flex align-items-center">
                       {% csrf_token %}
                       <button type="submit" class="btn btn-link" name="print_document" value="true" onclick="this.form.target='preview_{{ document.id }}'" style="margin: 0!important; padding: 0!important;"><i class="material-symbols-rounded text-sm me-2 ">print</i>Печать документа</button>
                   </form>
@@ -190,7 +191,7 @@
                             <span>Копировать</span>
                         </div>
                     </a>
-                    <a href="" class="text-sm">
+                    <a href="{% url 'download_document' document.id %}" class="text-sm">
                         <div class="d-flex align-items-center">
                         <i class="material-symbols-rounded me-2">file_download</i>
                             <span>Скачать</span>
@@ -295,7 +296,8 @@ document.addEventListener('DOMContentLoaded', calculateAllTotals);
   <script>
       function calculateAllVAT() {
     const tables = document.querySelectorAll('.document-table');
-
+    
+    
     tables.forEach(table => {
         let totalVAT = 0; // Общая сумма НДС
 
@@ -306,10 +308,19 @@ document.addEventListener('DOMContentLoaded', calculateAllTotals);
         rows.forEach(row => {
 
             const quantity = parseFloat(row.querySelector('.quantity').textContent.replace(/\s+/g, '').replace(/,/g, '.')) || 0;
+            let discount = (row.querySelector('.discount').textContent.replace(/\s+/g, '').replace(/,/g, '.')) || 0;
             const price = parseFloat(row.querySelector('.price').textContent.replace(/\s+/g, '').replace(/,/g, '.')) || 0;
 
+            if (discount.endsWith('%')) { 
+            discount = discount.slice(0, -1); 
+            discount = parseFloat(discount) || 0
+            discount = (discount / 100) * (quantity * price); 
+            } else {
+                discount = parseFloat(discount) || 0; 
+            }
 
-            const amountWithoutVAT = quantity * price;
+            const amountWithoutVAT = quantity * price - discount;
+
             const vat = (amountWithoutVAT * vatRate) / 100;
 
 

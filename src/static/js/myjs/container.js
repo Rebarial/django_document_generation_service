@@ -13,6 +13,7 @@ function updateFields(labels) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+
     const formsetBody = document.getElementById("formset-body");
     const ndsInput = document.getElementById("id_vat_rate");
     const discountInpu = document.getElementById("id_discount");
@@ -20,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function calculateTotalSum() {
         let ndsRate = 0;
         if (ndsInput) {
-            ndsRate = parseFloat(ndsInput.value) || 0;
+            ndsRate = parseFloat(vatRatesDict[ndsInput.value]) || 0;
         }
         let total = 0;
         let totalNds = 0;
@@ -51,7 +52,6 @@ document.addEventListener("DOMContentLoaded", function () {
     function calculateRowSum(row) {
         const quantity = parseFloat(row.querySelector(".quantity input").value) || 0;
         const price = parseFloat(row.querySelector(".price input").value) || 0;
-        const discountInput = row.querySelector(".discount input");
         //const discount = parseFloat(discountInpu.value) || 0;
 
         let discount = discountInpu.value;
@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let ndsValue = 0;
         if (ndsInput) {
-            ndsValue = parseFloat(ndsInput.value) || 0;
+            ndsValue = parseFloat(vatRatesDict[ndsInput.value]) || 0;
         }
 
         const amount = quantity * price - discount;
@@ -138,7 +138,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    ndsInput = document.getElementById("id_nds");
+    const ndsInput = document.getElementById("id_vat_rate");
+    const discountInpu = document.getElementById("id_discount");
 
     calculateTotalSum();
 
@@ -167,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let ndsRate = 0;
 
         if (ndsInput) {
-            ndsRate = parseFloat(ndsInput.value) || 0;
+            ndsRate = parseFloat(vatRatesDict[ndsInput.value]) || 0;
         }
 
         let total = 0;
@@ -326,6 +327,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (ndsInput) {
         $(ndsInput).on('change', function() {
+           setTimeout(calculateTotalSum, 100);
+        });
+    }
+
+    if (discountInpu) {
+        $(discountInpu).on('change', function() {
            setTimeout(calculateTotalSum, 100);
         });
     }

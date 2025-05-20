@@ -10,21 +10,62 @@ from datetime import date
 from django.forms import modelformset_factory
 
 class InvoiceDocumentForm(forms.ModelForm):
-    '''
-    # Валидаторы
-    inn_validator = RegexValidator(r'^\d+$', 'ИНН должен содержать только цифры.')
-    kpp_validator = RegexValidator(r'^\d+$', 'КПП должен содержать только цифры.')
-    bik_validator = RegexValidator(r'^\d+$', 'БИК должен содержать только цифры.')
-    
-    # Переопределение полей для валидации
-    organization_inn = forms.CharField(validators=[inn_validator], required=False)
-    organization_kpp = forms.CharField(validators=[kpp_validator], required=False)
-    organization_bik = forms.CharField(validators=[bik_validator], required=False)
-    '''
+
     def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
+        
+        print(kwargs)
+
+        if 'initial' in kwargs and 'organization' in kwargs['initial']:
+            self.fields['organization_bank'].queryset = BankDetails.objects.filter(
+                    organization=kwargs['initial']['organization']
+                )
+        elif 'data' in kwargs and 'organization' in kwargs['data']:
+            self.fields['organization_bank'].queryset = BankDetails.objects.filter(
+                    organization=kwargs['data']['organization']
+                )
+        else:
+            self.fields['organization_bank'].queryset = BankDetails.objects.none()
+
+        if 'initial' in kwargs and 'buyer' in kwargs['initial']:
+            self.fields['buyer_bank'].queryset = BankDetails.objects.filter(
+                    organization=kwargs['initial']['buyer']
+                )
+        elif 'data' in kwargs and 'buyer' in kwargs['data']:
+            self.fields['buyer_bank'].queryset = BankDetails.objects.filter(
+                    organization=kwargs['data']['buyer']
+                )
+        else:
+            self.fields['buyer_bank'].queryset = BankDetails.objects.none()
+
+        print(self.fields['organization_bank'].queryset)
+
+        if self.request and hasattr(self.request, 'user'):
+            user = self.request.user
+
+            seller_status = Status.objects.filter(name="Seller").first()
+            buyer_status = Status.objects.filter(name="Buyer").first()
+            consignee_status = Status.objects.filter(name="Consignee").first()
+
+            self.fields['organization'].queryset = Organization.objects.filter(
+                status_org__status=seller_status,
+                user=user
+            ).distinct()
+            
+            self.fields['buyer'].queryset = Organization.objects.filter(
+                status_org__status=buyer_status,
+                user=user
+            ).distinct()
+            
+            self.fields['consignee'].queryset = Organization.objects.filter(
+                status_org__status=consignee_status,
+                user=user
+            ).distinct()
+        
+
         for visible_field in self.visible_fields():
-            if (not "is_IP" in visible_field.name):
+            if ("from" not in visible_field.field.widget.attrs.get('class', '')):
                 visible_field.field.widget.attrs.update({
                     'class': 'form-control',
                 })
@@ -45,7 +86,7 @@ class InvoiceDocumentForm(forms.ModelForm):
         required=False
     )
 
-    seller_status = Status.objects.filter(name="Seller").first()  
+    seller_status = Status.objects.filter(name="Seller").first()
     
     organization = forms.ModelChoiceField(
         queryset=Organization.objects.filter(status_org__status=seller_status).distinct(),
@@ -115,35 +156,6 @@ class InvoiceDocumentForm(forms.ModelForm):
             'is_stamp': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
-        def __init__(self, *args, **kwargs):
-            request = kwargs.pop('request', None)
-            super().__init__(*args, **kwargs)
-
-            self.fields['organization_bank'].queryset = BankDetails.objects.none()
-            self.fields['buyer_bank'].queryset = BankDetails.objects.none()
-
-            if request:
-                self.fields['organization_bank'].queryset = BankDetails.objects.none()
-                self.fields['buyer_bank'].queryset = BankDetails.objects.none()
-                self.fields['organization'].queryset = Organization.objects.filter(user=request.user)
-                self.fields['counterparty'].queryset = Organization.objects.filter(user=request.user)
-                self.fields['consignee'].queryset = Organization.objects.filter(user=request.user)
-
-                '''
-                organization_id = request.POST.get("organization") or request.GET.get("organization") or (
-                    getattr(self.instance, "organization_id", None) if self.instance else None
-                )
-                if organization_id:
-                    self.fields['bank_organization'].queryset = Organization.objects.filter(
-                        organization_id=organization_id)
-
-                counterparty_id = request.POST.get("counterparty") or request.GET.get("counterparty") or (
-                    getattr(self.instance, "counterparty_id", None) if self.instance else None
-                )
-                if counterparty_id:
-                    self.fields['bank_counterparty'].queryset = Organization.objects.filter(
-                        organization_id=counterparty_id)
-                '''
         
 class InvoiceDocumentTableForm(forms.ModelForm):
     class Meta:
@@ -229,6 +241,7 @@ class OrganizationForm(forms.ModelForm):
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         for name, field in self.fields.items():
             if name == 'stamp':
                 field.label = ''
