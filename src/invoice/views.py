@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.db.models import Sum
 from django.template.loader import render_to_string
 from django.views.generic.edit import CreateView
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 from documents_сreating.models.documents.invoice_for_payment import DocumentInvoiceForPayment, InvoiceForPaymentItem
 from .forms import InvoiceDocumentForm, InvoiceDocumentTableFormSet, OrganizationForm, BankDetailsOrganizationForm
@@ -88,13 +88,29 @@ class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
 
         existing_obj = self.get_object()
-    
+
         if existing_obj:
             form.instance = existing_obj
 
         self.object = form.save(commit=False)
         self.object.user = self.request.user
-    
+        self.object.number = form.cleaned_data['number']
+
+        self.object.date = form.cleaned_data['date']
+        self.object.organization = form.cleaned_data['organization']
+        self.object.organization_bank = form.cleaned_data['organization_bank']
+        self.object.buyer = form.cleaned_data['buyer']
+        self.object.buyer_bank = form.cleaned_data['buyer_bank']
+        self.object.consignee = form.cleaned_data['consignee']
+        self.object.purpose_of_payment = form.cleaned_data['purpose_of_payment']
+        self.object.payment_for = form.cleaned_data['payment_for']
+        self.object.agreement = form.cleaned_data['agreement']
+        self.object.vat_rate = form.cleaned_data['vat_rate']
+        self.object.discount = form.cleaned_data['discount']
+        self.object.additional_info = form.cleaned_data['additional_info']
+        self.object.is_stamp = form.cleaned_data['is_stamp']
+
+        self.object.save()
         self.success_url = reverse_lazy('invoice_edit', kwargs={'id_doc': self.object.id})
 
         formset = InvoiceDocumentTableFormSet(self.request.POST)
@@ -120,35 +136,24 @@ class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
                 formset_data.append(row_data)
 
         self.object.items_docs.set(invoice_tables)
+ 
+        if not existing_obj:
+            response = HttpResponseRedirect(self.success_url)
+            return response
 
         if form.is_valid():
-            print(self.request.POST.get('download_pdf', default=None))
-            if self.request.POST.get("download_excel") == "true":
-                form_data = form.cleaned_data
-                print("Excel::")
-                
+            if self.request.POST.get("download_excel") == "true":                
                 excel_document = invoice_for_payment_excel_document_create.create_excel_document(self.object, None)
                 response = HttpResponse(excel_document.read(), content_type='application/pdf')
                 response['Content-Disposition'] = f'attachment; filename=test UPD.pdf'
-                print(response)
                 return response
-
-                return invoice_for_payment_excel_document_create.create_excel_document(self.object)
 
             if self.request.POST.get("download_pdf") == "true":
-                form_data = form.cleaned_data
-                print("PDF::")
-                print(type(self.object))
-                print(type(form_data))
-                print(form_data)
-                
                 excel_document = invoice_for_payment_excel_document_create.create_excel_document(self.object, None)
                 response = HttpResponse(excel_document.read(), content_type='application/pdf')
                 response['Content-Disposition'] = f'attachment; filename=test UPD.pdf'
-                print(response)
                 return response
-                
-        self.object.save()
+    
         #return "300"
         return super().form_valid(form)
 
@@ -160,10 +165,8 @@ def add_organization(request):
     if request.method == 'POST':
 
         prefix = request.POST.get('modal-prefix', None)
-        print(request.POST)
         existing_org_id = request.POST.get(f'org_id', None)
-        print(bool(existing_org_id))
-        print(existing_org_id)
+  
         if prefix:
             if existing_org_id:
                 organization = Organization.objects.get(id=existing_org_id)
@@ -183,10 +186,14 @@ def add_organization(request):
                     status_org_obj = StatusOrganization(organization=organization, status=status)
                     status_org_obj.save()
 
+                status_ids = list(selected_statuses.values_list('id', flat=True))
+                print(status_ids)
+
                 return JsonResponse(
                     {
                         'name': organization.name,
                         'id': organization.id,
+                        'statuses': status_ids
                     }
                 )
             else:
@@ -255,6 +262,7 @@ def fetch_organization_data(request):
             #bank_details = BankDetails.objects.filter(organization=organization).first()
 
             # Формируем словарь с данными организации
+            print(request.build_absolute_uri(organization.stamp.url) if organization.stamp else None)
             data = {
                 'name': organization.name,
                 'inn': organization.inn,
@@ -269,8 +277,8 @@ def fetch_organization_data(request):
                 'accountant_name': organization.accountant_name,
                 'conventional_name': organization.conventional_name,
                 'statuses': status_ids,
-                #'stamp': organization.stamp,
-                #'signature': organization.signature,
+                'stamp': request.build_absolute_uri(organization.stamp.url) if organization.stamp else None,
+                'signature': request.build_absolute_uri(organization.signature.url) if organization.signature else None,
                 'id': organization.id,
             }
             print(data)
@@ -345,7 +353,7 @@ def invoice_document(request):
     if org_param:
         documents = documents.filter(organization=org_param)
     if coun_param:
-        documents = documents.filter(counterparty=coun_param)
+        documents = documents.filter(buyer=coun_param)
 
     if request.GET.get('cnt_page_paginator', ''):
         cnt_page = int(request.GET.get('cnt_page_paginator'))
@@ -370,6 +378,7 @@ def invoice_document(request):
     page_range = list(paginator.page_range)
 
     if request.method == 'POST' and 'delete_document' in request.POST:
+        print("im in")
         document_id = request.POST.get('document_id')
         document = DocumentInvoiceForPayment.objects.get(id=document_id, user=request.user)
         document.delete()

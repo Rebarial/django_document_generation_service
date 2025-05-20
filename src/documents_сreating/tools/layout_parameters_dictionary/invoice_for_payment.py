@@ -30,13 +30,13 @@ invoice_for_payment_dict = {
     "Images":[
         {
             "type": "stamp",
-            "cell": ("CU", 21),
+            "cell": ("CM", 19),
             "width": 110,
             "height": 110
         },
         {
             "type": "signature",
-            "cell": ("CB", 20),
+            "cell": ("BQ", 18),
             "width": 110,
             "height": 70
         },

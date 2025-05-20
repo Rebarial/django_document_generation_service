@@ -16,27 +16,53 @@ function addRowDropLine(formId, modalId, prefix) {
         }).then(response => response.json()).then(data => {
             if (data.errors) {
                 alert('Ошибка: ' + JSON.stringify(data.errors));
-            } else {
+            } else 
+            {
                 document.querySelector(modalId + ' .btn-close').click();
 
                 
+                //data.statuses
+                for (let i = 1; i <= 4; i++) {
+                    let select = null
+                    if (i == 1){
+                        select = document.getElementById('id_organization');
+                    }
+                    else if (i == 2)
+                    {
+                        select = document.getElementById('id_buyer');
+                    }
+                    else if(i == 4)
+                    {
+                        select = document.getElementById('id_consignee');
+                    }
+                    else {
+                        continue;
+                    }
 
-                const select = document.getElementById(selectId);
-                const selectedIndex = select.selectedIndex;
-                
-                if (selectedIndex != 0) {
+                    optionNotFound = true
+                    for (let j = 0; j < select.options.length; j++) {
+                        if (select.options[j].value == data.id) {
+                            optionNotFound = false;
+                            let selectedOption = select.options[j];
+                            if (data.statuses.includes(i)){
+                                selectedOption.textContent = data.name;
+                            }
+                            else {
+                                select.remove(j);
+                            }
+                            break;
+                        }
+                    }
+                    if (optionNotFound && data.statuses.includes(i)) 
+                    {
+                        let option = new Option(data.name, data.id, true, true);
+                        select.add(option);
+                    }
                     
-                    const selectedOption = select.options[selectedIndex];
-                    selectedOption.textContent = data.name;
-                }
-                else
-                {
-                    const option = new Option(data.name, data.id, true, true);
-                    select.add(option);
                 }
 
             }
-        }).catch(error => console.error('Ошибка:', error));
+        })
     });
 }
 

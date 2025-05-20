@@ -71,7 +71,7 @@ class BaseExcelDocumentCreate(ABC):
                         "offset": offset_local
                     })
 
-        if "Images" in self.document_dict:
+        if "Images" in self.document_dict and document.is_stamp:
 
             organization = Organization.objects.filter(inn=self.get_nested_attribute(document, inn_field)).first()
 

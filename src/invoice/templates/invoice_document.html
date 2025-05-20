@@ -80,11 +80,11 @@
             <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title" style="margin-bottom:-5px;">Счет на оплату №{{ document.name }}</h5>
+                        <h5 class="card-title" style="margin-bottom:-5px;">Счет на оплату №{{ document.number }}</h5>
                         <small class="form-text text-muted">{{ document.date|date:"j E Y" }}</small>
                         <p></p>
-                        <p class="card-text">Огранизация: {{ document.organization.naming }}</p>
-                        <p class="card-text">Контрагент: {{ document.counterparty.naming }}</p>
+                        <p class="card-text">Огранизация: {{ document.organization.name }}</p>
+                        <p class="card-text">Контрагент: {{ document.counterparty.name }}</p>
                         <a href="{% url 'edit_document' document.id 'invoice' %}" class="btn btn-warning">Редактировать</a>
                         <form method="post" class="d-inline">
                             {% csrf_token %}

@@ -18,6 +18,8 @@ function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id)
             form.find(prefix + '-director_position').val('');
             form.find(prefix + '-accountant_name').val('');
             form.find(prefix + '-conventional_name').val('');
+            form.find(prefix + '-stamp').val('');
+            form.find(prefix + '-signature').val('');
 
             form.find(`${prefix}-statuses input[type="checkbox"]`).each(function() {
                 const value = Number($(this).val()); 
@@ -51,6 +53,9 @@ function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id)
                 form.find(prefix + '-director_position').val(response.director_position);
                 form.find(prefix + '-accountant_name').val(response.accountant_name);
                 form.find(prefix + '-conventional_name').val(response.conventional_name);
+                //form.find(prefix + '-stamp').val(response.stamp);
+                //document.getElementById('stamp-preview').src = response.stamp;
+                //form.find(prefix + '-signature').val(response.signature);
 
                 const selectedStatuses = response.statuses || [];
                 form.find(`${prefix}-statuses input[type="checkbox"]`).each(function() {
@@ -65,7 +70,8 @@ function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id)
                 });
 
             },
-            error: function() {
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert(errorThrown)
                 form.find(prefix + '-id').val('');
                 form.find(prefix + '-name').val('');
                 form.find(prefix + '-inn').val('');
@@ -79,6 +85,8 @@ function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id)
                 form.find(prefix + '-director_position').val('');
                 form.find(prefix + '-accountant_name').val('');
                 form.find(prefix + '-conventional_name').val('');
+                form.find(prefix + '-stamp').val('');
+                form.find(prefix + '-signature').val('');
                 let statusesCheckboxes = $('input[name="' + prefix + '_statuses[]"]');
 
                 form.find(`${prefix}-statuses input[type="checkbox"]`).each(function() {

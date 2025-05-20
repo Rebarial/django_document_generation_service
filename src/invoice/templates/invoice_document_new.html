@@ -74,7 +74,7 @@
                 <label>Контрагент</label>
             <select name="filter_coun" class="form-select select2">
                 <option value="">Контрагент</option>
-                {% for org in buyer %}
+                {% for org in counterparty %}
                 <option value="{{ org.id }}" {% if request.GET.filter_coun == org.id|stringformat:"s" %} selected {% endif %}>{{ org.name }} (ИНН: {{ org.inn }})</option>
                 {% endfor %}
             </select>
@@ -145,7 +145,7 @@
                 {% for document in page_obj %}
                 <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg" style="flex-wrap: wrap-reverse;">
                   <div class="d-flex flex-column">
-                    <a href="{% url 'invoice_edit' document.id %}" class="mb-3 text-sm" style="font-size: 16px !important; font-weight: 600 !important;">Счет на оплату №{{ document.name }} от {{ document.date|date:"j E Y" }}</a>
+                    <a href="{% url 'invoice_edit' document.id %}" class="mb-3 text-sm" style="font-size: 16px !important; font-weight: 600 !important;">Счет на оплату №{{ document.number }} от {{ document.date|date:"j E Y" }}</a>
                     <span class="mb-2 text-xs">Дата создания: <span class="text-dark font-weight-bold ms-sm-2">{{ document.date|date:"j E Y" }}</span></span>
                     <span class="mb-2 text-xs">Огранизация: <span class="text-dark ms-sm-2 font-weight-bold">{{ document.organization.name }}</span></span>
                     <span class="text-xs">Контрагент: <span class="text-dark ms-sm-2 font-weight-bold">{{ document.buyer.name }} (ИНН: {{ document.buyer.inn }})</span></span>
@@ -205,7 +205,7 @@
                             <button type="submit" name="delete_document" class="btn btn-link text-danger text-gradient px-3 mb-0" style="padding-left:0!important;"><i class="material-symbols-rounded text-sm me-2">delete</i>Удалить</button>
 
                     </form>
-                    <a class="btn btn-link text-dark px-3 mb-0" href=""><i class="material-symbols-rounded text-sm me-2">edit</i>Редактировать</a>
+                    <a class="btn btn-link text-dark px-3 mb-0" href="{% url 'invoice_edit' document.id %}"><i class="material-symbols-rounded text-sm me-2">edit</i>Редактировать</a>
                   </div>
                 </li>
                 {% empty %}

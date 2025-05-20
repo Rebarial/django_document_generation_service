@@ -11,6 +11,9 @@ class VatRate(BaseModel):
         verbose_name = 'Ставка НДС'
         verbose_name_plural = 'Ставки НДС'
         ordering = ['code']
+    
+    def __str__(self):
+        return f"{self.rate}"
 
 class Currency(BaseModel):
     code = models.CharField(max_length=3, verbose_name='Код')

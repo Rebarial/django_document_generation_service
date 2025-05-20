@@ -52,7 +52,17 @@ document.addEventListener("DOMContentLoaded", function () {
         const quantity = parseFloat(row.querySelector(".quantity input").value) || 0;
         const price = parseFloat(row.querySelector(".price input").value) || 0;
         const discountInput = row.querySelector(".discount input");
-        const discount = parseFloat(discountInpu.value) || 0;
+        //const discount = parseFloat(discountInpu.value) || 0;
+
+        let discount = discountInpu.value;
+
+        if (discount.endsWith('%')) { 
+            discount = discount.slice(0, -1); 
+            discount = parseFloat(discount) || 0
+            discount = (discount / 100) * (quantity * price); 
+        } else {
+            discount = parseFloat(discount) || 0; 
+        }
 
         let ndsValue = 0;
         if (ndsInput) {
@@ -90,6 +100,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (ndsInput) {
         $(ndsInput).on('change', function() {
+            recalculateAllRows();
+        });
+    }
+
+    if (discountInpu) {
+        $(discountInpu).on('change', function() {
             recalculateAllRows();
         });
     }
