@@ -8,7 +8,8 @@ invoice_for_payment_dict = {
         "purpose_of_payment" : ("A", 15),
         "organization.director_name" : ("AI", 20),
         "organization.director_position": ("A", 20),
-        "organization.accountant_name": ("AI", 22)
+        "organization.accountant_name": ("AI", 22),
+        "purpose_of_payment":("A",15),
     },
     "Concatenation": {
         "organization.address": ("A", 8),
@@ -25,7 +26,7 @@ invoice_for_payment_dict = {
         "buyer_bank.name": ("AY", 8),
         "buyer_bank.address": ("AY", 8),
         "buyer_bank.correspondent_account": ("AY", 8),
-        "buyer_bank.bik": ("A", 8),
+        "buyer_bank.bik": ("AY", 8),
     },
     "Images":[
         {
@@ -46,7 +47,10 @@ invoice_for_payment_dict = {
         {
             "items_model_name": "items_docs", #Название таблицы из которой будут браться строки
             "cell_itmes_number": 13, #Номер строки, с которой начинается вставка
-            "items_content": #Содержание вставки ключ – название поля модели, значение – буква ячейки
+            "sum_cell": ("CN", 14),
+            "sum_str": ("A", 14),
+            "row_number": "A",
+            "items_content": #Содержание вставки ключ – название поля модели, значение – буква ячейки            
             {
                 "name": "E",
                 "price": "BB",
@@ -54,10 +58,15 @@ invoice_for_payment_dict = {
                 "unit": "BY",
                 "sum": "CN"
             },
+            "static_content":
+            {
+                "vat_rate.name": "CG",
+            },
         },
     ),
     "Custom_data" :
     {
+        "vat_rate_sum": ("A", 14),
         "inn_field": "organization.inn",
         "invoice_organization_info_cell_number": 1,
         "invoice_organization_info_items":{

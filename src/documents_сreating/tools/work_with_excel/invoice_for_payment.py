@@ -33,8 +33,7 @@ class InvoiceForPaymentExcelDocumentCreate(BaseExcelDocumentCreate):
             date = self.document_dict["Custom_data"]["document_name"]["date"]
             if hasattr(document, date) and self.get_nested_attribute(document, date):
                 sheet[self.get_cell_ref(self.document_dict["Custom_data"]["document_name"]["cell"], offset)].value += f' от {self.get_nested_attribute(document, date).day}" {self.get_nested_attribute(document, date).strftime("%B %Y г.")}'
-
-        print()            
+           
 
         invoice_organization_info_dict_value = []
         for item in self.document_dict["Custom_data"]["invoice_organization_info_value"]:
@@ -48,12 +47,18 @@ class InvoiceForPaymentExcelDocumentCreate(BaseExcelDocumentCreate):
                 "offset": self.add_document_itmes(
                     sheet=sheet,
                     items=invoice_organization_info_dict_value,
-                    cell_itmes_number=self.document_dict["Custom_data"]["invoice_organization_info_cell_number"], 
-                    items_content=self.document_dict["Custom_data"]["invoice_organization_info_items"],
+                    offsets=offset, 
+                    items_dict={
+                        "items_content": self.document_dict["Custom_data"]["invoice_organization_info_items"],
+                        "cell_itmes_number": self.document_dict["Custom_data"]["invoice_organization_info_cell_number"]
+                        },
                     height_orientation_name = "info",
                     height_orientation_column = "A",
                 )
         })
+
+        cell = self.get_cell_ref(self.document_dict["Custom_data"]["vat_rate_sum"], offset)
+        sheet[cell] = "Итого (" + document.vat_rate.name + "):\n"
 
         fill_dict = self.fill_doc(document, sheet, offset, self.document_dict["Custom_data"]["inn_field"])
 

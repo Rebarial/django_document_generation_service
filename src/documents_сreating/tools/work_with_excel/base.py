@@ -14,6 +14,7 @@ from typing import BinaryIO
 import math
 import subprocess
 import locale
+from pytils.numeral import rubles
 
 locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 
@@ -34,7 +35,6 @@ class BaseExcelDocumentCreate(ABC):
                 dk = getattr(dk, it)
             return dk
         except:
-            print(item)
             return None
 
 
@@ -57,17 +57,12 @@ class BaseExcelDocumentCreate(ABC):
         if "Defoult_items" in self.document_dict:
             
             for item_data in self.document_dict["Defoult_items"]:
-                cell_itmes_number = item_data["cell_itmes_number"] #Номер строки с которой начинаются строки товаров
-                sum_offset = 0
-                for item in offset:
-                    if item["cell_itmes_number"] < cell_itmes_number:
-                        sum_offset += item["offset"]
                 
                 items_list = list(self.get_nested_attribute(document,item_data["items_model_name"]).all().values())
                 if items_list:
-                    offset_local = self.add_document_itmes(sheet, list(self.get_nested_attribute(document,item_data["items_model_name"]).all().values()), cell_itmes_number+sum_offset, item_data["items_content"]) #Количество строк товаров
+                    offset_local = self.add_document_itmes(sheet, list(self.get_nested_attribute(document,item_data["items_model_name"]).all().values()), offset, item_data, document) #Количество строк товаров
                     offset.append({
-                        "cell_itmes_number": cell_itmes_number,
+                        "cell_itmes_number": item_data["cell_itmes_number"],
                         "offset": offset_local
                     })
 
@@ -87,7 +82,11 @@ class BaseExcelDocumentCreate(ABC):
                 if self.get_nested_attribute(document, key):
                     cell = self.get_cell_ref(cell_ref, offset)
                     if sheet[cell].value != None:
-                        sheet[cell].value += f", {self.get_nested_attribute(document, key)}"
+                        #sheet[cell].value += f", {self.get_nested_attribute(document, key)}"
+                        if sheet.values == "":
+                            sheet[cell].value += f"{self.get_nested_attribute(document, key)}"
+                        else:
+                            sheet[cell].value += f"\n{self.get_nested_attribute(document, key)}"
                         value = sheet[cell].value
                         self.row_height_from_content(sheet, value, cell)
                     else:
@@ -144,18 +143,22 @@ class BaseExcelDocumentCreate(ABC):
         PS сейчас возвращает pdf
         """
         pass
+    
+    def get_row_with_offset(self, row: int, offset: list) -> int:
+        sum = 0
+        for item in offset:
+            if "cell_itmes_number" in item and row > item["cell_itmes_number"]:
+                sum += item["offset"]
+        
+        return row + sum
+
 
     def get_cell_ref(self, key: tuple[str, int], offset: dict) -> str:
         """
         Возвращает строковое представление ссылки excel на основе кортежа, учитывая смещение при добавлении items
         """
         num = key[1]
-        for item in offset:
-            cell_itmes_number = item["cell_itmes_number"]
-            offset = item["offset"]  
-            if cell_itmes_number and num > cell_itmes_number: 
-                num += offset
-        return f"{key[0]}{num}"
+        return f"{key[0]}{self.get_row_with_offset(num, offset)}"
 
     def find_nearest_lesser_or_equal(self, numbers: tuple, target: int) -> int:
 
@@ -235,7 +238,29 @@ class BaseExcelDocumentCreate(ABC):
         img.height = height
         sheet.add_image(img, cell)
 
-    def add_document_itmes(self, sheet: Worksheet, items: dict, cell_itmes_number: int, items_content: dict, height_orientation_name: str = 'name', height_orientation_column: str = 'R') -> int:
+    def float_to_kopecks(self, amount):
+        # Получаем дробную часть числа
+        fractional_part = amount % 1
+
+        # Преобразуем её в целые копейки
+        kopecks = round(fractional_part * 100)
+
+        # Формирование строки с двумя цифрами копеек
+        kopecks_str = f"{kopecks:02d}"
+
+        # Склоняем слово "копейка"
+        if 11 <= abs(kopecks) % 100 <= 14:
+            word_form = 'копеек'
+        elif abs(kopecks) % 10 == 1:
+            word_form = 'копейка'
+        elif 2 <= abs(kopecks) % 10 <= 4:
+            word_form = 'копейки'
+        else:
+            word_form = 'копеек'
+
+        return f'{kopecks_str} {word_form}'
+
+    def add_document_itmes(self, sheet: Worksheet, items: dict, offsets: list, items_dict: dict, document: BaseModel = None,height_orientation_name: str = 'name', height_orientation_column: str = 'R') -> int:
         """
         Вставляет строки в таблицу excel и возвращает смещение
         """
@@ -243,6 +268,10 @@ class BaseExcelDocumentCreate(ABC):
         merge_items = []
         merge_items_name = None
         offset = 0
+        cell_itmes_number = items_dict["cell_itmes_number"]
+
+        cell_itmes_number = self.get_row_with_offset(cell_itmes_number, offsets)
+
         #Заполняем список координат объедененных ячеек после строки с таблицы
         for mrg in sheet.merged_cells.ranges:
             start_col, start_row, end_col, end_row = range_boundaries(str(mrg))  # получаем границы объединённой области
@@ -272,6 +301,7 @@ class BaseExcelDocumentCreate(ABC):
          })
         
         offset = len(items)-1#.count()
+        sum = 0
         #Добавляем строки и заполняем
         for i, item in enumerate(items):
             number_of_row = cell_itmes_number + i
@@ -285,23 +315,40 @@ class BaseExcelDocumentCreate(ABC):
                 target_cell.border = style['border']
                 target_cell.alignment = style['alignment']
 
-            for key, cell_ref in items_content.items():
-                if key in item and item[key]:
-                    value = str(item[key])
-                    sheet[f'{cell_ref}{number_of_row}'] = value
+            if "row_number" in items_dict:
+                sheet[f'{items_dict["row_number"]}{number_of_row}'] = i + 1
 
-                    if key == height_orientation_name:
-                        
-                        if merge_items_name:
-                            coords = range_boundaries(str(merge_items_name))
-                            column_width = int(coords[2]) - int(coords[0])
-                            new_height = self.calculate_row_height(value, target_cell.font, column_width)
-                            sheet.row_dimensions[cell_itmes_number + i].height = self.calculate_row_height(value, target_cell.font, column_width)
+            if "items_content" in items_dict:
+                for key, cell_ref in items_dict["items_content"].items():
+                    if key in item and item[key]:
+                        value = str(item[key])
+                        sheet[f'{cell_ref}{number_of_row}'] = value
+
+                        if "sum_cell" in items_dict and cell_ref == items_dict["sum_cell"][0]:
+                            sum += float(value)
+
+                        if key == height_orientation_name:
+                            
+                            if merge_items_name:
+                                coords = range_boundaries(str(merge_items_name))
+                                column_width = int(coords[2]) - int(coords[0])
+                                sheet.row_dimensions[cell_itmes_number + i].height = self.calculate_row_height(value, target_cell.font, column_width)
+
+            if "static_content" in items_dict and document:
+                for key, cell_ref in items_dict["static_content"].items():
+                    value = self.get_nested_attribute(document, key)
+                    sheet[f'{cell_ref}{number_of_row}'] = value
 
             for area in merge_items:
                 coords = range_boundaries(str(area))
                 adjusted_area = f'{get_column_letter(coords[0])}{number_of_row}:{get_column_letter(coords[2])}{number_of_row}'
                 sheet.merge_cells(adjusted_area)
+
+        if sum:
+            sheet[f'{items_dict["sum_cell"][0]}{self.get_row_with_offset(items_dict["sum_cell"][1]+offset, offsets)}'] = f"{sum:.2f}"
+            if "sum_str" in items_dict:
+                print(int(sum))
+                sheet[f'{items_dict["sum_str"][0]}{self.get_row_with_offset(items_dict["sum_str"][1]+offset, offsets)}'].value += rubles(int(sum), zero_for_kopeck=False).capitalize() + " " + self.float_to_kopecks(sum)
 
         #Возвращаем высоту строк после добавления
         for row, height in row_heights.items():

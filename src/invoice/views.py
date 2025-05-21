@@ -189,6 +189,7 @@ def add_organization(request):
             else:
                 org_form = OrganizationForm(request.POST, request.FILES, prefix=prefix)
 
+            print(request.FILES)
             if org_form.is_valid():
 
                 organization = org_form.save(commit=False)
@@ -202,7 +203,6 @@ def add_organization(request):
                     status_org_obj.save()
 
                 status_ids = list(selected_statuses.values_list('id', flat=True))
-                print(status_ids)
 
                 return JsonResponse(
                     {
