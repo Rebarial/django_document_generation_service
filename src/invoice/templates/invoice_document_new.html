@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'general_html_templates/base.html' %}
 {% load static %}
 {% load custom_filters %}
 {% block title %}Счет | RFTK{% endblock %}
@@ -181,7 +181,7 @@
                           </tbody>
                     </table>
                        <div class="d-flex align-items-center" style="margin-top: 35px; gap: 20px;">
-                    <form method="POST" action="{% url 'download_document' document.id %}" class="d-flex align-items-center">
+                    <form method="POST" action="{% url 'download_document' 'invoice' document.id %}" class="d-flex align-items-center">
                       {% csrf_token %}
                       <button type="submit" class="btn btn-link" name="print_document" value="true" onclick="this.form.target='preview_{{ document.id }}'" style="margin: 0!important; padding: 0!important;"><i class="material-symbols-rounded text-sm me-2 ">print</i>Печать документа</button>
                   </form>
@@ -191,7 +191,7 @@
                             <span>Копировать</span>
                         </div>
                     </a>
-                    <a href="{% url 'download_document' document.id %}" class="text-sm">
+                    <a href="{% url 'download_document' 'invoice' document.id %}" class="text-sm">
                         <div class="d-flex align-items-center">
                         <i class="material-symbols-rounded me-2">file_download</i>
                             <span>Скачать</span>
@@ -283,7 +283,7 @@ function calculateAllTotals() {
 
         const totalCell = table.querySelector('#total-amount');
         if (totalCell) {
-            totalCell.textContent = total.toFixed(1);
+            totalCell.textContent = total.toFixed(2);
         }
 
     });
@@ -303,7 +303,6 @@ document.addEventListener('DOMContentLoaded', calculateAllTotals);
 
         const vatRate = parseFloat(table.dataset.vatRate) || 0;
 
-
         const rows = table.querySelectorAll('.form-row');
         rows.forEach(row => {
 
@@ -322,9 +321,6 @@ document.addEventListener('DOMContentLoaded', calculateAllTotals);
             const amountWithoutVAT = quantity * price - discount;
 
             const vat = (amountWithoutVAT * vatRate) / 100;
-
-
-
 
             totalVAT += vat;
         });

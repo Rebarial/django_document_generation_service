@@ -112,7 +112,7 @@ $(document).ready(function () {
         $("#id_bank-bic").val(inn);
         $("#bicSuggestions").hide();
 
-        fetch(`/find-bank/?bik=${inn}`)
+        fetch(`/find-bank/?bic=${inn}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -175,16 +175,16 @@ document.getElementById("findByINN").addEventListener("click", function() {
         .catch(error => console.error("Ошибка при запросе данных:", error));
 });
 
-document.getElementById("findByBIK").addEventListener("click", function() {
-    let bikInput = document.getElementById("id_bank-bic");
-    let bik = bikInput.value.trim();
+document.getElementById("findBybic").addEventListener("click", function() {
+    let bicInput = document.getElementById("id_bank-bic");
+    let bic = bicInput.value.trim();
 
-    if (!bik) {
+    if (!bic) {
         alert("Введите БИК");
         return;
     }
 
-    fetch(`/find-bank/?bik=${bik}`)
+    fetch(`/find-bank/?bic=${bic}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {

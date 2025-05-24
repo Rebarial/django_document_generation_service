@@ -45,7 +45,13 @@ function addRowDropLine(formId, modalId, prefix) {
                             optionNotFound = false;
                             let selectedOption = select.options[j];
                             if (data.statuses.includes(i)){
-                                selectedOption.textContent = data.name;
+                                let result_str = ""
+                                if (data.name)
+                                    result_str += data.name + " "
+                                if (data.inn) 
+                                    result_str += data.inn
+
+                                selectedOption.textContent = result_str;
                             }
                             else {
                                 select.remove(j);
@@ -55,7 +61,13 @@ function addRowDropLine(formId, modalId, prefix) {
                     }
                     if (optionNotFound && data.statuses.includes(i)) 
                     {
-                        let option = new Option(data.name, data.id, true, true);
+                        let result_str = ""
+                        if (data.name)
+                            result_str += data.name + " "
+                        if (data.inn) 
+                            result_str += data.inn
+
+                        let option = new Option(result_str, data.id, true, true);
                         select.add(option);
                     }
                     

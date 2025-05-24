@@ -27,6 +27,15 @@ class Organization(BaseModel):
         verbose_name_plural = 'Организации'
         ordering = ['name']
 
+    def __str__(self):
+        result = ""
+        if self.name:
+            result += self.name + " "
+        if self.inn:
+            result += self.inn
+
+        return result
+
 class Status(BaseModel):
     name = models.CharField(max_length=255, blank=True, null=True, verbose_name='Наименование')
     
@@ -47,7 +56,7 @@ class StatusOrganization(BaseModel):
 class BankDetails(BaseModel):
     
     organization = models.ForeignKey('Organization', on_delete=models.CASCADE, related_name='bank_details', verbose_name='Реквизиты банка')
-    bik = models.CharField(max_length=9, blank=True, null=True, verbose_name='БИК')
+    bic = models.CharField(max_length=9, blank=True, null=True, verbose_name='БИК')
     name = models.CharField(max_length=250, blank=True, null=True, verbose_name='Наименование')
     address = models.CharField(max_length=500, blank=True, null=True, verbose_name='Место нахождения банка')
     correspondent_account = models.CharField(max_length=20, blank=True, null=True, verbose_name='Корреспондентский счет')
@@ -60,33 +69,3 @@ class BankDetails(BaseModel):
     
     def __str__(self):
         return f"{self.name}, {self.current_account}"
-
-"""
-class Seller(Organization):
-    
-    class Meta:
-        verbose_name = 'Продавец'
-        verbose_name_plural = 'Продавец'
-        ordering = ['name']
-
-class Buyer(Organization):
-    
-    class Meta:
-        verbose_name = 'Покупатель'
-        verbose_name_plural = 'Покупатель'
-        ordering = ['name']
-
-class Consignee(Organization):
-
-    class Meta:
-        verbose_name = 'Грузополучатель'
-        verbose_name_plural = 'Грузополучатель'
-        ordering = ['name']
-
-class Consignor(Organization):
-
-    class Meta:
-        verbose_name = 'Грузоотправитель'
-        verbose_name_plural = 'Грузоотправитель'
-        ordering = ['name']
-"""

@@ -417,7 +417,13 @@ class BaseExcelDocumentCreate(ABC):
         buffer.seek(0)
         return buffer
 
-    def toPDF_libre(self, file_path: str) -> BytesIO:
+    def toPDF_libre(self, byte_stream: BytesIO) -> BytesIO:
+
+        file_path = 'temp.xlsx'
+
+        with open(file_path, 'wb') as file:
+            file.write(byte_stream.getvalue())
+
 
         base_dir = os.path.dirname(file_path)
         filename = os.path.basename(file_path).split('.')[0]

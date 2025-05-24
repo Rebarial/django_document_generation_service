@@ -65,6 +65,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'documents_сreating.context_processors.global_nav_context',
             ],
         },
     },
@@ -136,8 +137,9 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 # Основной url для управления медиафайлами
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Путь хранения картинок
-MEDIA_ROOT = BASE_DIR / 'media'
+#MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_URL = '/users/login/'

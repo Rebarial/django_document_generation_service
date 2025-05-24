@@ -39,3 +39,6 @@ document.getElementById("findByINN").addEventListener("click", function() {
         })
         .catch(error => console.error("Ошибка при запросе данных:", error));
 });
+
+
+

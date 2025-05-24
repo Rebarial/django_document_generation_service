@@ -8,7 +8,7 @@ function BankhandleModalEvent(modalSelector, orgIdInputSelector, prefix) {
         if (!selectedOrgID){
             form.find(prefix + '-id').val('');
             form.find(prefix + '-name').val('');
-            form.find(prefix + '-bik').val('');
+            form.find(prefix + '-bic').val('');
             form.find(prefix + '-address').val('');
             form.find(prefix + '-correspondent_account').val('');
             form.find(prefix + '-current_account').val('');
@@ -25,7 +25,7 @@ function BankhandleModalEvent(modalSelector, orgIdInputSelector, prefix) {
                 // Заполняем поля формы значениями из API
                 form.find(prefix + '-id').val(response.id);
                 form.find(prefix + '-name').val(response.name);
-                form.find(prefix + '-bik').val(response.bik);
+                form.find(prefix + '-bic').val(response.bic);
                 form.find(prefix + '-address').val(response.address);
                 form.find(prefix + '-correspondent_account').val(response.correspondent_account);
                 form.find(prefix + '-current_account').val(response.current_account);
@@ -34,7 +34,7 @@ function BankhandleModalEvent(modalSelector, orgIdInputSelector, prefix) {
             error: function() {
                 form.find(prefix + '-id').val('');
                 form.find(prefix + '-name').val('');
-                form.find(prefix + '-bik').val('');
+                form.find(prefix + '-bic').val('');
                 form.find(prefix + '-address').val('');
                 form.find(prefix + '-correspondent_account').val('');
                 form.find(prefix + '-current_account').val('');

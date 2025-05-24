@@ -257,7 +257,7 @@ function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id)
             selectedOrgID = $(orgIdInputSelector).val(),
             form = $(this).find('form');
         
-
+        alert(`${prefix}-statuses input[type="checkbox"]`)
         if (!selectedOrgID){
             form.find(prefix + '-id').val('');
             form.find(prefix + '-name').val('');
@@ -977,20 +977,20 @@ document.getElementById("findByINN").addEventListener("click", function() {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    let findByBIKButton = document.getElementById("findByBIK");
+    let findBybicButton = document.getElementById("findBybic");
 
-    if (findByBIKButton) {
-        findByBIKButton.addEventListener("click", function () {
-            let bikInput = document.getElementById("id_bank-bic");
-            if (!bikInput) return;
+    if (findBybicButton) {
+        findBybicButton.addEventListener("click", function () {
+            let bicInput = document.getElementById("id_bank-bic");
+            if (!bicInput) return;
 
-            let bik = bikInput.value.trim();
-            if (!bik) {
+            let bic = bicInput.value.trim();
+            if (!bic) {
                 alert("Введите БИК");
                 return;
             }
 
-            fetch(`/find-bank/?bik=${bik}`)
+            fetch(`/find-bank/?bic=${bic}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -1056,20 +1056,20 @@ document.getElementById("findByINNCounterparty").addEventListener("click", funct
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    let findByBIKButton = document.getElementById("findByBIKCounterparty");
+    let findBybicButton = document.getElementById("findBybicCounterparty");
 
-    if (findByBIKButton) {
-        findByBIKButton.addEventListener("click", function () {
-            let bikInput = document.getElementById("id_counterparty_bank-bic");
-            if (!bikInput) return;
+    if (findBybicButton) {
+        findBybicButton.addEventListener("click", function () {
+            let bicInput = document.getElementById("id_counterparty_bank-bic");
+            if (!bicInput) return;
 
-            let bik = bikInput.value.trim();
-            if (!bik) {
+            let bic = bicInput.value.trim();
+            if (!bic) {
                 alert("Введите БИК");
                 return;
             }
 
-            fetch(`/find-bank/?bik=${bik}`)
+            fetch(`/find-bank/?bic=${bic}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -1126,7 +1126,7 @@ $(document).ready(function () {
         $("#id_bank-bic").val(inn);
         $("#bicSuggestions").hide();
 
-        fetch(`/find-bank/?bik=${inn}`)
+        fetch(`/find-bank/?bic=${inn}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -1187,7 +1187,7 @@ $(document).ready(function () {
         $("#id_counterparty_bank-bic").val(inn);
         $("#bicSuggestionsCounterparty").hide();
 
-        fetch(`/find-bank/?bik=${inn}`)
+        fetch(`/find-bank/?bic=${inn}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -1300,7 +1300,7 @@ $(document).ready(function () {
         $("#id_bank_org-bic").val(inn);
         $("#bicSuggestionsBank").hide();
 
-        fetch(`/find-bank/?bik=${inn}`)
+        fetch(`/find-bank/?bic=${inn}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -1407,7 +1407,7 @@ $(document).ready(function () {
         $("#id_bank_coun-bic").val(inn);
         $("#bicSuggestionsBankCoun").hide();
 
-        fetch(`/find-bank/?bik=${inn}`)
+        fetch(`/find-bank/?bic=${inn}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {

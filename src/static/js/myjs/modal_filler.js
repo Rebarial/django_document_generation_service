@@ -9,7 +9,8 @@ function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id)
             form.find(prefix + '-name').val('');
             form.find(prefix + '-inn').val('');
             form.find(prefix + '-kpp').val('');
-            form.find(prefix + '-is_ip')[0].checked = false;
+            let isIPValue = 'False';
+            form.find(prefix + '-is_ip').val(isIPValue); 
             form.find(prefix + '-ogrn').val('');
             form.find(prefix + '-address').val('');
             form.find(prefix + '-telephone').val('');
@@ -20,6 +21,11 @@ function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id)
             form.find(prefix + '-conventional_name').val('');
             form.find(prefix + '-stamp').val('');
             form.find(prefix + '-signature').val('');
+            document.getElementById(prefix + '-stamp_url').src = '';
+            document.getElementById(prefix + '-signature_url').src = '';
+
+            document.getElementById(prefix + '-signature-preview').innerHTML = '<small>Новое изображение:</small>';
+            document.getElementById(prefix + '-stamp-preview').innerHTML = '<small>Новое изображение:</small>';
 
             form.find(`${prefix}-statuses input[type="checkbox"]`).each(function() {
                 const value = Number($(this).val()); 
@@ -44,7 +50,8 @@ function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id)
                 form.find(prefix + '-name').val(response.name);
                 form.find(prefix + '-inn').val(response.inn);
                 form.find(prefix + '-kpp').val(response.kpp);
-                form.find(prefix + '-is_ip')[0].checked = response.is_ip;
+                let isIPValue = response.is_ip ? 'True' : 'False';
+                form.find(prefix + '-is_ip').val(isIPValue); 
                 form.find(prefix + '-ogrn').val(response.ogrn);
                 form.find(prefix + '-address').val(response.address);
                 form.find(prefix + '-telephone').val(response.telephone);
@@ -53,15 +60,20 @@ function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id)
                 form.find(prefix + '-director_position').val(response.director_position);
                 form.find(prefix + '-accountant_name').val(response.accountant_name);
                 form.find(prefix + '-conventional_name').val(response.conventional_name);
-                //form.find(prefix + '-stamp').val(response.stamp);
-                //document.getElementById('stamp-preview').src = response.stamp;
-                //form.find(prefix + '-signature').val(response.signature);
+                form.find(prefix + '-stamp').val('');
+                form.find(prefix + '-signature').val('');
+
+                document.getElementById(prefix + '-stamp_url').src = response.stamp_url;
+                document.getElementById(prefix + '-signature_url').src = response.signature_url;
+                
+                document.getElementById(prefix + '-signature-preview').innerHTML = '<small>Новое изображение:</small>';
+                document.getElementById(prefix + '-stamp-preview').innerHTML = '<small>Новое изображение:</small>';
+            
 
                 const selectedStatuses = response.statuses || [];
                 form.find(`${prefix}-statuses input[type="checkbox"]`).each(function() {
-                    const value = Number($(this).val()); 
-                    //const value = $(this).val();
-                    // Проверяем, находится ли значение среди выбранных сервером
+                    const value = Number($(this).val());
+                    // Проверка значения статуса
                     if (selectedStatuses.includes(value)) {
                         this.checked = true;
                     } else {
@@ -76,7 +88,8 @@ function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id)
                 form.find(prefix + '-name').val('');
                 form.find(prefix + '-inn').val('');
                 form.find(prefix + '-kpp').val('');
-                form.find(prefix + '-is_ip')[0].checked = false;
+                let isIPValue = 'False';
+                form.find(prefix + '-is_ip').val(isIPValue); 
                 form.find(prefix + '-ogrn').val('');
                 form.find(prefix + '-address').val('');
                 form.find(prefix + '-telephone').val('');
@@ -87,6 +100,12 @@ function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id)
                 form.find(prefix + '-conventional_name').val('');
                 form.find(prefix + '-stamp').val('');
                 form.find(prefix + '-signature').val('');
+                document.getElementById(prefix + '-stamp_url').src = '';
+                document.getElementById(prefix + '-signature_url').src = '';
+                
+                document.getElementById(prefix + '-signature-preview').innerHTML = '<small>Новое изображение:</small>';
+                document.getElementById(prefix + '-stamp-preview').innerHTML = '<small>Новое изображение:</small>';
+
                 let statusesCheckboxes = $('input[name="' + prefix + '_statuses[]"]');
 
                 form.find(`${prefix}-statuses input[type="checkbox"]`).each(function() {

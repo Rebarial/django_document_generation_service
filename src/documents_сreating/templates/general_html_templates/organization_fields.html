@@ -1,0 +1,230 @@
+<div class="row">
+    {% for field in org_form %}
+    {% if field.name == 'is_ip' %}
+   {% else %}
+    <div class="col-md-6 mb-3 form-floating">
+        {% if field.name == 'inn'%}
+        <div class="input-group">
+            {{ field }}
+            <button type="button" class="btn btn-primary" id="{{ org_form.prefix }}-findByINN" style="background-color:#e91e63;">Найти</button>
+        </div>
+        <div id="id_{{field.html_name}}-Suggestions" class="dropdown-menu"></div>
+        {% elif field.name == 'statuses' %}
+          <div class="d-flex justify-content-between">
+          {% for status in field %}
+          <div class="form-check" id="{{ field.auto_id }}">
+          {{ status.tag }}
+          <label class="form-check-label" for="{{ status.id_for_label }}">
+              {{ status.choice_label }}
+          </label>
+          </div>
+          {% endfor %}
+          </div>
+          {% elif field.name == 'ogrn' %}
+          <div class="d-flex align-items-center gap-1">
+            <div>
+                {{ org_form.is_ip }}
+            </div>
+            <div class="flex-grow-1">
+                {{ field }}
+            </div>
+          </div>
+        {% elif field.name == 'stamp' or field.name == 'signature' %}
+        {% if field.help_text %}
+        <small class="form-text text-muted">{{ field.help_text }}</small>
+        {% endif %}
+            <label class="form-label">{{ field.label }}</label>
+            <div class="input-group mb-2">
+                <input type="file" 
+           name="{{ field.html_name }}" 
+           class="form-control" 
+           accept="image/*" 
+           id="{{ field.auto_id }}"
+           {% if field.value %}data-has-file="true"{% endif %}>
+            </div>
+            
+            <div class="d-flex align-items-center mb-2">
+                <div class="me-3">
+                    <small>Текущее изображение:</small>      
+                    {% if field.value and field.value.url %}
+                    <img src="{{ field.value.url }}" alt="{{ field.label }}" id="#{{ field.auto_id }}_url"
+                    {% else %}
+                    <img src="" alt="{{ field.label }}" id="#{{ field.auto_id }}_url"
+                    {% endif %}
+                         class="img-thumbnail d-block" style="max-height: 80px;">
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" 
+                         name="{{ field.html_name }}-clear" id="{{ field.html_name }}-clear_id"
+                         onclick="if(this.checked) {document.getElementById('{{ field.auto_id }}').value = ''; document.getElementById('#id_{{ field.html_name }}-preview').innerHTML = '<small>Новое изображение:</small>';}">
+                         
+                    <label class="form-check-label" for="{{ field.html_name }}-clear_id">
+                        Удалить текущее изображение
+                    </label>
+                </div>
+                
+            </div>
+            <div id="#id_{{ field.html_name }}-preview" class="mt-2">
+                    <small>Новое изображение:</small>
+            </div>
+
+        {% else %}
+        {{ field }}
+        <label class="form-label">{{ field.label }}</label>
+        {% if field.help_text %}
+        <small class="form-text text-muted">{{ field.help_text }}</small>
+        {% endif %}
+        {% endif %}
+        {% if field.errors %}
+            <div class="text-danger">
+                {% for error in field.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+<script>
+//Предпросмотр картинок
+if (typeof handleImagePreview === 'undefined') {
+    const handleImagePreview = (inputId, previewId) => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        let previewContainer = document.getElementById(previewId);
+                        if (!previewContainer) {
+                            previewContainer = document.createElement('div');
+                            previewContainer.id = previewId;
+                            previewContainer.className = 'mt-2';
+                            input.parentNode.parentNode.appendChild(previewContainer);
+                        }
+                        previewContainer.innerHTML = `
+                            <small>Новое изображение:</small>
+                            <img src="${event.target.result}" 
+                                alt="Preview" 
+                                class="img-thumbnail" 
+                                style="max-height: 100px;">
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    };;
+
+    const handleImageClear = (inputId, clearId) => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    const clearCheckbox = document.getElementById(clearId);
+                    if (clearCheckbox) {
+                        clearCheckbox.checked = false;
+                    }
+                }
+            });
+        }
+    };
+
+    window.handleImagePreview = handleImagePreview;
+    window.handleImageClear = handleImageClear;
+}
+
+handleImagePreview('{{ org_form.stamp.auto_id }}', '#id_{{ org_form.stamp.html_name }}-preview');
+handleImagePreview('{{ org_form.signature.auto_id }}', '#id_{{ org_form.signature.html_name }}-preview');
+handleImageClear('{{ org_form.stamp.auto_id }}', '{{ org_form.stamp.html_name }}-clear_id');
+handleImageClear('{{ org_form.signature.auto_id }}', '{{ org_form.signature.html_name }}-clear_id');
+</script>
+<script>
+    if (typeof innDropDown === 'undefined') {
+    const innDropDown = (btn, element_id, prefix) =>{
+    $(document).ready(function () {
+        $("#" + element_id).on("input", function () {
+            let query = $(this).val();
+            
+            if (query.length < 3) {
+                $("#" + element_id + "-Suggestions").empty().hide();
+                return;
+            }
+    
+            $.ajax({
+                url: "/inn_autocomplete",
+                data: { query: query },
+                dataType: "json",
+                success: function(data) {
+                    let suggestions = data.suggestions;
+                    let dropdown = $("#" + element_id + "-Suggestions");
+                    
+                    dropdown.empty();
+    
+                    if (suggestions.length) {
+                        suggestions.forEach(function(item) {
+                            dropdown.append(`
+                                <div class="dropdown-item dropdown-item-${element_id}" data-inn="${item.inn}">
+                                    ${item.value}
+                                </div>
+                            `);
+                        });
+                        
+                        dropdown.show();
+                    } else {
+                        dropdown.hide();
+                    }
+                }
+            });
+        });
+        $(document).on("click", `.dropdown-item-${element_id}`, function () {
+            let inn = $(this).data("inn");
+            $("#" + element_id).val(inn);
+            $("#" + element_id + "-Suggestions").hide();
+    
+            fetch(`/find-company/?inn=${inn}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById(prefix + "-name").value = "";
+                document.getElementById(prefix + "-kpp").value = "";
+                document.getElementById(prefix + "-ogrn").value = "";
+                document.getElementById(prefix + "-director_position").value = "";
+                if (data.success) {
+                    if (data.type == 'Юридическое лицо') {
+                        document.getElementById(prefix + "-name").value = data.name;
+                        document.getElementById(prefix + "-kpp").value = data.kpp;
+                        document.getElementById(prefix + "-ogrn").value = data.ogrn;
+                        document.getElementById(prefix + "-address").value = data.address;
+                        document.getElementById(prefix + "-director_position").value = data.position_at_work;
+                        document.getElementById(prefix + "-director_name").value = data.supervisor;
+                        document.getElementById(prefix + "-is_ip").value = 'False';
+                    }
+                    else {
+                        document.getElementById(prefix + "-name").value = data.name;
+                        document.getElementById(prefix + "-ogrn").value = data.ogrn;
+                        document.getElementById(prefix + "-address").value = data.address;
+                        document.getElementById(prefix + "-is_ip").value = 'True';
+                    }
+    
+    
+                } else {
+                    alert("Организация не найдена");
+                }
+            })
+            .catch(error => console.error("Ошибка при запросе данных:", error));
+        });
+    
+        $(document).click(function (e) {
+            if (!$(e.target).closest(`#${element_id}-Suggestions, #${element_id}`).length) {
+                $("#" + element_id + "-Suggestions").hide();
+            }
+        });
+    });
+};
+window.innDropDown = innDropDown;
+}
+innDropDown("{{ org_form.prefix }}-findByINN","id_{{ org_form.prefix }}-inn", "id_{{ org_form.prefix }}")
+</script>

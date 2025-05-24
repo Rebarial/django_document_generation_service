@@ -1,0 +1,129 @@
+{% extends 'general_html_templates/base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block title %}Добавить огранизацию | RFTK{% endblock %}
+{% block head %}
+    <script src="{% static 'js/profile.js' %}" defer></script>
+    <script src="{% static 'js/imask/Imask.min.js' %}" ></script>
+{% endblock %}
+{% block content %}
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-3 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+
+        <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+          <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+
+          </div>
+          <ul class="navbar-nav d-flex align-items-center  justify-content-end">
+
+            <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+              <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+                <div class="sidenav-toggler-inner">
+                  <i class="sidenav-toggler-line"></i>
+                  <i class="sidenav-toggler-line"></i>
+                  <i class="sidenav-toggler-line"></i>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="container-fluid py-2">
+      <div class="row">
+        <div class="col-12">
+          <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3">
+                <h6 class="text-white text-capitalize ps-3">Добавление организации</h6>
+              </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+              <div class="card-body">
+                <form method="post" class="text-start" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="card mb-4 p-3">
+            {% include 'general_html_templates/organization_fields.html' with org_form=org_form %}
+                    <div class="card mb-4 p-3">
+                    {% include 'general_html_templates/bank_fields.html' with bank=bank_form %}
+            </div>
+
+
+
+        <div class="d-flex justify-content-start" style="margin-top: 7px;">
+            <button type="submit" class="btn btn-primary" style="margin-right: 7px; background-color:#e91e63;">Сохранить</button>
+        </div>
+      </form>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </main>
+  {% endblock %}
+  {% block scripts %}
+  <!--   Core JS Files   -->
+
+  <!-- Github buttons -->
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="{% static 'js/material-dashboard.min.js' %}"></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', () => {
+
+    document.querySelectorAll('input[type="tel"]').forEach(input => {
+        let phoneMask = IMask(input, { mask: "+{7} (000) 000-00-00" });
+
+        function validatePhoneNumber() {
+            let t = input.value.replace(/\D/g, "");
+            return t.length < 11 ? (input.setCustomValidity("Необходимо минимум 11 цифр"), !1) : (input.setCustomValidity(""), !0);
+        }
+
+        input.addEventListener("input", validatePhoneNumber);
+    });
+});
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Предпросмотр изображений
+    const handleImagePreview = (inputId, previewId) => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        let previewContainer = document.getElementById(previewId);
+                        if (!previewContainer) {
+                            previewContainer = document.createElement('div');
+                            previewContainer.id = previewId;
+                            previewContainer.className = 'mt-2';
+                            input.parentNode.parentNode.appendChild(previewContainer);
+                        }
+                        previewContainer.innerHTML = `
+                            <small>Новое изображение:</small>
+                            <img src="${event.target.result}" 
+                                 alt="Preview" 
+                                 class="img-thumbnail" 
+                                 style="max-height: 100px;">
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    };
+
+    handleImagePreview('id_stamp', 'stamp-preview');
+    handleImagePreview('id_signature', 'signature-preview');
+});
+</script>
+{% endblock %}

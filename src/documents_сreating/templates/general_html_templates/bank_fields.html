@@ -1,0 +1,96 @@
+{% load custom_filters %}
+<div class="row">
+    {% for field in bank %}
+    <div class="col-md-6 mb-3 form-floating">
+        
+        {% if field.name == 'bic'%}
+        <div class="input-group">
+            {{ field }}
+            <button type="button" class="btn btn-primary" id="{{ org_form.prefix }}-findBybic" style="background-color:#e91e63;">Найти</button>
+        </div>
+        <div id="id_{{field.html_name}}-bicSuggestions" class="dropdown-menu"></div>
+        {% else %}
+        {{ field|add_attr:"required=true" }}
+        <label class="form-label">{{ field.label }}</label>
+        {% if field.help_text %}
+        <small class="form-text text-muted">{{ field.help_text }}</small>
+        {% endif %}
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+<script>
+// Проверяем существование bicDropDown глобально перед объявлением
+if (typeof bicDropDown === 'undefined') {
+    // Объявляем функциональный обработчик дропдауна для банков
+    const bicDropDown = (btn, element_id, prefix) => {
+        $(document).ready(function() {
+            // Следим за вводом в поле с указанным ID
+            $("#" + element_id).on("input", function() {
+                let query = $(this).val(); // Получаем введённый текст
+                
+                if (query.length < 3) { // Если символов меньше трёх — скрываем подсказки
+                    $("#" + element_id + "-bicSuggestions").empty().hide();
+                    return;
+                }
+
+                // Отправляем AJAX-запрос для автозаполнения банков
+                $.ajax({
+                    url: "/bank_autocomplete",
+                    data: { query: query }, // Передача введённого текста
+                    dataType: "json",
+                    success: function(data) {
+                        let suggestions = data.suggestions;
+                        let dropdown = $("#" + element_id + "-bicSuggestions"); // Найденное выпадающее меню
+                        
+                        dropdown.empty(); // Очищаем предыдущие данные
+
+                        if (suggestions.length > 0) { // Если есть совпадения
+                            suggestions.forEach(function(item) {
+                                dropdown.append(`
+                                    <div class="dropdown-item dropdown-item-${element_id}" data-bic="${item.bic}">
+                                        ${item.value}
+                                    </div>
+                                `); // Добавляем пункты выпадающего списка
+                            });
+                            
+                            dropdown.show(); // Показываем список
+                        } else {
+                            dropdown.hide(); // Скрываем пустой список
+                        }
+                    }
+                });
+            });
+
+            // Кликаем по элементу выпадающего списка банка
+            $(document).on("click", `.dropdown-item-${element_id}`, function() {
+                let bic = $(this).data("bic"); // Берём выбранный BIC
+                $("#" + element_id).val(bic); // Записываем в поле ввода
+                $("#" + element_id + "-bicSuggestions").hide(); // Скрываем выпадающий список
+                // Отправляем запрос на получение данных о банке
+                fetch(`/find-bank/?bic=${bic}`)
+                .then(response => response.json()) // Преобразуем ответ в JSON
+                .then(data => {
+                    if (data.success) { // Если банк успешно найден
+                        document.getElementById(prefix + "-name").value = data.bank_name;
+                        document.getElementById(prefix + "-address").value = data.address;
+                        document.getElementById(prefix + "-correspondent_account").value = data.correspondent_account;
+                    } else {
+                        alert("Банк не найден");
+                    }
+                })
+                .catch(error => console.error("Ошибка при запросе данных:", error)); // Логи ошибок
+            });
+
+            // Скрытие выпадающего списка вне кликов по нему
+            $(document).click(function(e) {
+                if (!$(e.target).closest(`#${element_id}-bicSuggestions, #${element_id}`).length) {
+                    $("#" + element_id + "-bicSuggestions").hide();
+                }
+            });
+        });
+    };
+    window.bicDropDown = bicDropDown; // Экспортируем функцию наружу
+}
+bicDropDown(null, "id_{{ bank.prefix }}-bic", "id_{{ bank.prefix }}");
+</script>

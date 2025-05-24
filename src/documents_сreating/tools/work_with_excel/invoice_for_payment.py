@@ -10,18 +10,18 @@ class InvoiceForPaymentExcelDocumentCreate(BaseExcelDocumentCreate):
     def __init__(self, document_dict: dict, template_path: str):
         super().__init__(document_dict, template_path)
 
-
-    def create_excel_document(self, document: BaseModel, converter: Callable) -> BytesIO:
-
-        print(type(document))
-        print(vars(document))
-        print(vars(document.organization))
-
+    def create_pdf_document(self, document: BaseModel, converter: Callable) -> BytesIO:
         if not converter:
             converter = self.toPDF_libre
 
+        return converter(self.create_excel_document(document))
+
+
+    def create_excel_document(self, document: BaseModel, in_file = False) -> BytesIO:
+
         workbook = load_workbook(self.template_path)
         sheet = workbook.active
+        sheet.title = f'Счет на оплату №{document.number} от {document.date}'
         offset = []
 
         if "document_name" in self.document_dict["Custom_data"]:
@@ -68,12 +68,12 @@ class InvoiceForPaymentExcelDocumentCreate(BaseExcelDocumentCreate):
 
         #Для корректного отображения с toPDF_libre
         sheet.page_setup.scale = 99
+   
+        output = BytesIO()
+        workbook.save(output)
+        output.seek(0)
+        return output
 
-        temp_file_name = 'temp.xlsx'
-        
-        workbook.save(temp_file_name)
-
-        return converter(temp_file_name)
 
 invoice_for_payment_excel_document_create = InvoiceForPaymentExcelDocumentCreate(
     document_dict=invoice_for_payment_dict,

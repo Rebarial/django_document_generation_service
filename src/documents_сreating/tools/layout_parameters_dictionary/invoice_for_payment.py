@@ -18,7 +18,7 @@ invoice_for_payment_dict = {
         "organization_bank.name": ("A", 8),
         "organization_bank.address": ("A", 8),
         "organization_bank.correspondent_account": ("A", 8),
-        "organization_bank.bik": ("A", 8),
+        "organization_bank.bic": ("A", 8),
 
         "buyer.address": ("AY", 8),
         "buyer.inn": ("AY", 8),
@@ -26,7 +26,7 @@ invoice_for_payment_dict = {
         "buyer_bank.name": ("AY", 8),
         "buyer_bank.address": ("AY", 8),
         "buyer_bank.correspondent_account": ("AY", 8),
-        "buyer_bank.bik": ("AY", 8),
+        "buyer_bank.bic": ("AY", 8),
     },
     "Images":[
         {

@@ -1,40 +1,32 @@
 from django.shortcuts import render
 
-from django.db.models import Sum
-from django.template.loader import render_to_string
 from django.views.generic.edit import CreateView
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from documents_сreating.models.documents.invoice_for_payment import DocumentInvoiceForPayment, InvoiceForPaymentItem
-from .forms import InvoiceDocumentForm, InvoiceDocumentTableFormSet, OrganizationForm, BankDetailsOrganizationForm
+from .forms import InvoiceDocumentForm, InvoiceDocumentTableFormSet
+from documents_сreating.forms import OrganizationForm, BankDetailsOrganizationForm
 from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.utils.dateparse import parse_date
-from documents_сreating.tools.work_with_excel.invoice_for_payment import invoice_for_payment_excel_document_create
-from django.http import HttpResponse
-from documents_сreating.models.organization import Organization, BankDetails, StatusOrganization, Status
+from documents_сreating.models.organization import Organization, Status
 from documents_сreating.models.reference import VatRate
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-import json
-
-def main(request):
-    return render(request, 'main.html')
+from documents_сreating.views import create_excel, create_pdf
 
 
 class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
     model = DocumentInvoiceForPayment
     form_class = InvoiceDocumentForm
     template_name = 'invoice_document_form_new.html'
-    #template_name = 'test.html'
 
-    #success_url = reverse_lazy('invoices_list')
-    success_url = reverse_lazy('invoice_document')#, kwargs={'id_doc': object.attrs})
+    success_url = reverse_lazy('invoice_document')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['request'] = self.request  # Добавляем request в kwargs формы
+        kwargs['request'] = self.request 
         return kwargs
 
     def get_object(self, queryset=None):
@@ -97,28 +89,14 @@ class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
         existing_obj = self.get_object()
 
         if existing_obj:
-            form.instance = existing_obj
+            form = InvoiceDocumentForm(self.request.POST, instance=existing_obj)
+            if not form.is_valid():  # Повторно проверяем валидность
+                return self.form_invalid(form)
+            #form.instance = existing_obj
 
         self.object = form.save(commit=False)
         self.object.user = self.request.user
-        self.object.number = form.cleaned_data['number']
-
-        self.object.date = form.cleaned_data['date']
-        self.object.organization = form.cleaned_data['organization']
-        self.object.organization_bank = form.cleaned_data['organization_bank']
-        self.object.buyer = form.cleaned_data['buyer']
-        self.object.buyer_bank = form.cleaned_data['buyer_bank']
-        self.object.consignee = form.cleaned_data['consignee']
-        self.object.purpose_of_payment = form.cleaned_data['purpose_of_payment']
-        self.object.payment_for = form.cleaned_data['payment_for']
-        self.object.agreement = form.cleaned_data['agreement']
-        self.object.vat_rate = form.cleaned_data['vat_rate']
-        self.object.discount = form.cleaned_data['discount']
-        self.object.additional_info = form.cleaned_data['additional_info']
-        self.object.is_stamp = form.cleaned_data['is_stamp']
-
         self.object.save()
-        #self.success_url = reverse_lazy('invoice_edit', kwargs={'id_doc': self.object.id})
 
         formset = InvoiceDocumentTableFormSet(self.request.POST)
 
@@ -149,203 +127,17 @@ class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
             return response
 
         if form.is_valid():
-            if self.request.POST.get("download_excel") == "true":                
-                excel_document = invoice_for_payment_excel_document_create.create_excel_document(self.object, None)
-                response = HttpResponse(excel_document.read(), content_type='application/pdf')
-                response['Content-Disposition'] = f'attachment; filename=test UPD.pdf'
-                return response
+            if self.request.POST.get("download_excel") == "true":              
+                return create_excel('invoice',self.object)
 
             if self.request.POST.get("download_pdf") == "true":
-                excel_document = invoice_for_payment_excel_document_create.create_excel_document(self.object, None)
-                response = HttpResponse(excel_document.read(), content_type='application/pdf')
-                response['Content-Disposition'] = f'attachment; filename=test UPD.pdf'
-                return response
+                return create_pdf('invoice', self.object)
     
-        #return "300"
         return super().form_valid(form)
 
     def form_invalid(self, form):
         print("Form validation failed with errors:", form.errors.as_data())
         return super().form_invalid(form)
-
-def download_pdf(request, id_doc):
-    if id_doc:
-        document = DocumentInvoiceForPayment.objects.get(id = id_doc)
-        excel_document = invoice_for_payment_excel_document_create.create_excel_document(document, None)
-        response = HttpResponse(excel_document.read(), content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename=test UPD.pdf'
-        return response
-
-def add_organization(request):
-    if request.method == 'POST':
-
-        prefix = request.POST.get('modal-prefix', None)
-        existing_org_id = request.POST.get(f'org_id', None)
-  
-        if prefix:
-            if existing_org_id:
-                organization = Organization.objects.get(id=existing_org_id)
-                org_form = OrganizationForm(request.POST, request.FILES, instance=organization, prefix=prefix)
-            else:
-                org_form = OrganizationForm(request.POST, request.FILES, prefix=prefix)
-
-            print(request.FILES)
-            if org_form.is_valid():
-
-                organization = org_form.save(commit=False)
-                organization.user = request.user
-                organization.save()
-
-                StatusOrganization.objects.filter(organization=organization).delete()
-                selected_statuses = org_form.cleaned_data['statuses']
-                for status in selected_statuses:
-                    status_org_obj = StatusOrganization(organization=organization, status=status)
-                    status_org_obj.save()
-
-                status_ids = list(selected_statuses.values_list('id', flat=True))
-
-                return JsonResponse(
-                    {
-                        'name': organization.name,
-                        'id': organization.id,
-                        'statuses': status_ids
-                    }
-                )
-            else:
-                errors = org_form.errors.as_json()
-                return JsonResponse({'errors': errors})
-        else:
-            return JsonResponse({'errors': "Действие не поддерживается"})
-
-
-def add_bank_organization(request):
-    if request.method == 'POST':
-        prefix = request.POST.get('modal-prefix', None)
-        print(request.POST)
-
-        existing_org_id = request.POST.get('org', None)
-        existing_bank_id = request.POST.get('bank', None)
-        print(existing_org_id)
-        print(prefix)
-
-        if prefix:
-            if existing_bank_id:
-                bank = BankDetails.objects.get(id=existing_bank_id)
-                bank_form = BankDetailsOrganizationForm(request.POST, request.FILES, instance=bank, prefix=prefix)
-            else:
-                bank_form = BankDetailsOrganizationForm(request.POST, request.FILES, prefix=prefix)
-
-            if bank_form.is_valid():
-                
-                
-
-                bank = bank_form.save(commit=False)
-                if existing_org_id:
-                    organization = Organization.objects.get(id=existing_org_id)
-                    bank.organization = organization
-                bank.save()
-
-                return JsonResponse(
-                    {
-                        'name': bank.name,
-                        'id': bank.id,
-                    }
-                )
-                return JsonResponse(
-                    {
-                        'name': '2'
-                    }
-                )
-            else:
-                errors = bank_form.errors.as_json()
-                return JsonResponse({'errors': errors})
-        else:
-            return JsonResponse({'errors': "Действие не поддерживается"})
-      
-
-def fetch_organization_data(request):
-    """ Возвращает данные организации по переданному ID. """
-    if request.method == 'GET':
-        org_id = request.GET.get('org_id')
-        try:
-            # Ищем организацию по переданному ID
-            print(org_id)
-            organization = get_object_or_404(Organization, pk=org_id)
-            status_ids = list(StatusOrganization.objects.filter(organization=organization).values_list('status_id', flat=True))
-            print(status_ids)
-            # Получаем привязанные банковские реквизиты
-            #bank_details = BankDetails.objects.filter(organization=organization).first()
-
-            # Формируем словарь с данными организации
-            print(request.build_absolute_uri(organization.stamp.url) if organization.stamp else None)
-            data = {
-                'name': organization.name,
-                'inn': organization.inn,
-                'kpp': organization.kpp,
-                'is_ip': organization.is_ip,
-                'ogrn': organization.ogrn,
-                'address': organization.address,
-                'telephone': organization.telephone,
-                'fax': organization.fax,
-                'director_name': organization.director_name,
-                'director_position': organization.director_position,
-                'accountant_name': organization.accountant_name,
-                'conventional_name': organization.conventional_name,
-                'statuses': status_ids,
-                'stamp': request.build_absolute_uri(organization.stamp.url) if organization.stamp else None,
-                'signature': request.build_absolute_uri(organization.signature.url) if organization.signature else None,
-                'id': organization.id,
-            }
-            print(data)
-            return JsonResponse(data)
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
-    else:
-        return JsonResponse({"error": "Метод не поддерживается"}, status=405)
-
-
-def fetch_organization_bank_data(request):
-    """ Возвращает данные банка организации по переданному ID. """
-    if request.method == 'GET':
-        bank_id = request.GET.get('bank_id')
-        print(bank_id)
-        try:
-            bank = get_object_or_404(BankDetails, pk=bank_id)
-            print(bank)
-            data = {
-                'name': bank.name,
-                'bik': bank.bik,
-                'address': bank.address,
-                'correspondent_account': bank.correspondent_account,
-                'current_account': bank.current_account,
-                'id': bank.id,
-            }
-            print(data)
-            return JsonResponse(data)
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
-    else:
-        return JsonResponse({"error": "Метод не поддерживается"}, status=405)
-    
-
-def fetch_bank_from_organization(request):
-    if request.method == 'GET':
-        org_id = request.GET.get('org_id')
-        try:
-            banks = BankDetails.objects.filter(organization__id=org_id).values('id', 'name')
-            list_result = [entry for entry in banks]
-            print(banks)
-            print(list_result)
-            data = {
-                'banks': list_result
-                }
-            print(data)
-            return JsonResponse(data)
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
-    else:
-        return JsonResponse({"error": "Метод не поддерживается"}, status=405)
-    
 
 @login_required
 def invoice_document(request):
