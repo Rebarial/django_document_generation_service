@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 from documents_сreating.views import create_excel, create_pdf
 from django.shortcuts import get_object_or_404
 from documents_сreating.forms import OrganizationForm
+from django.contrib.auth.decorators import login_required
 
 class UtdDocumentCreateView(LoginRequiredMixin, CreateView):
     model = DocumentUTD
@@ -154,6 +155,7 @@ class UtdDocumentCreateView(LoginRequiredMixin, CreateView):
         print("Form validation failed with errors:", form.errors.as_data())
         return super().form_invalid(form)
 
+@login_required
 def utd_document(request):
     query = request.GET.get('q', '')
     date_from = request.GET.get('date_from', '')
