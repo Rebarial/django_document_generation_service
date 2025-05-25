@@ -60,12 +60,9 @@ def add_organization(request):
 def add_bank_organization(request):
     if request.method == 'POST':
         prefix = request.POST.get('modal-prefix', None)
-        print(request.POST)
 
         existing_org_id = request.POST.get('org', None)
         existing_bank_id = request.POST.get('bank', None)
-        print(existing_org_id)
-        print(prefix)
 
         if prefix:
             if existing_bank_id:
@@ -75,8 +72,6 @@ def add_bank_organization(request):
                 bank_form = BankDetailsOrganizationForm(request.POST, request.FILES, prefix=prefix)
 
             if bank_form.is_valid():
-                
-                
 
                 bank = bank_form.save(commit=False)
                 if existing_org_id:
@@ -324,14 +319,14 @@ def create_pdf(doc_name, doc):
     print(models_dict[doc_name]['engine'])
     pdf_document = models_dict[doc_name]['engine'].create_pdf_document(doc, None)
     response = HttpResponse(pdf_document.read(), content_type='application/pdf')
-    filename = urllib.parse.quote(f'Счет на оплату №{doc.number} от {doc.date}.pdf', safe='')
+    filename = urllib.parse.quote(f'{models_dict[doc_name]["name"]} №{doc.number} от {doc.date}.pdf', safe='')
     response['Content-Disposition'] = f'attachment; filename={filename}'
     return response
 
 def create_excel(doc_name, doc):
     excel_document = models_dict[doc_name]['engine'].create_excel_document(doc, None)
     response = HttpResponse(excel_document.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    filename = urllib.parse.quote(f'Счет на оплату №{doc.number} от {doc.date}.xlsx', safe='')
+    filename = urllib.parse.quote(f'{models_dict[doc_name]["name"]} №{doc.number} от {doc.date}.xlsx', safe='')
     response['Content-Disposition'] = f'attachment; filename={filename}'
     return response
 
@@ -359,6 +354,12 @@ def edit_organization(request, id_org):
             organization.user = request.user
             organization.save()
 
+            StatusOrganization.objects.filter(organization=organization).delete()
+            selected_statuses = org_form.cleaned_data['statuses']
+            for status in selected_statuses:
+                status_org_obj = StatusOrganization(organization=organization, status=status)
+                status_org_obj.save()
+
             if any(bank_form.data.get('bank-' + field) for field in bank_form.fields):
                 for field in bank_form.fields.values():
                     field.required = True
@@ -375,7 +376,8 @@ def edit_organization(request, id_org):
             return redirect('profile')
 
     else:
-        org_form = OrganizationForm(instance=organization, prefix='organization')
+        initial_statuses = list(StatusOrganization.objects.filter(organization=organization).values_list('status_id', flat=True))
+        org_form = OrganizationForm(initial={'statuses': initial_statuses}, instance=organization, prefix='organization')
         bank_form = BankDetailsOrganizationForm(instance=bank_details, prefix='bank')
 
     return render(request, 'add_organization_new.html', {
@@ -436,7 +438,13 @@ def add_counterparty_from_profile(request):
         if counterparty_form.is_valid():
             organization = counterparty_form.save(commit=False)
             organization.user = request.user
-            # organization.save()
+            organization.save()
+
+            StatusOrganization.objects.filter(organization=organization).delete()
+            selected_statuses = counterparty_form.cleaned_data['statuses']
+            for status in selected_statuses:
+                status_org_obj = StatusOrganization(organization=organization, status=status)
+                status_org_obj.save()
 
             if any(counterparty_bank_form.data.get('counterparty_bank-' + field) for field in
                    counterparty_bank_form.fields):
@@ -453,7 +461,7 @@ def add_counterparty_from_profile(request):
                         'counterparty_bank_form': counterparty_bank_form
                     })
 
-            organization.save()
+            
             return redirect('profile')
     else:
         counterparty_form = OrganizationForm(initial={'statuses': [2]}, prefix='counterparty')
@@ -467,11 +475,16 @@ def add_organization_from_profile(request):
     if request.method == 'POST':
         org_form = OrganizationForm(request.POST, request.FILES, prefix='organization')
         bank_form = BankDetailsOrganizationForm(request.POST, prefix='bank')
-        org_form.statuses[1] = True
         if org_form.is_valid():
             organization = org_form.save(commit=False)
             organization.user = request.user
             organization.save()
+
+            StatusOrganization.objects.filter(organization=organization).delete()
+            selected_statuses = org_form.cleaned_data['statuses']
+            for status in selected_statuses:
+                status_org_obj = StatusOrganization(organization=organization, status=status)
+                status_org_obj.save()
 
             if any(bank_form.data.get('bank-' + field) for field in bank_form.fields):
                 for field in bank_form.fields.values():

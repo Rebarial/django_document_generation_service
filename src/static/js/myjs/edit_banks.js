@@ -101,7 +101,7 @@ function handleModalEvent(modalSelector, orgIdInputSelector, prefix, default_id)
 };
 
 $(document).ready(function () {
-    handleModalEvent('#addOrganizationModal', '#id_organization_bank', '#id_organization_bank', 1);
+    handleModalEvent('#addsellerModal', '#id_organization_bank', '#id_organization_bank', 1);
 });
 
 

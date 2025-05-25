@@ -10,6 +10,7 @@ invoice_for_payment_dict = {
         "organization.director_position": ("A", 20),
         "organization.accountant_name": ("AI", 22),
         "purpose_of_payment":("A",15),
+        "additional_info":("A",18),
     },
     "Concatenation": {
         "organization.address": ("A", 8),
@@ -67,7 +68,7 @@ invoice_for_payment_dict = {
     "Custom_data" :
     {
         "vat_rate_sum": ("A", 14),
-        "inn_field": "organization.inn",
+        "org_field": "organization.id",
         "invoice_organization_info_cell_number": 1,
         "invoice_organization_info_items":{
             "info": "A",

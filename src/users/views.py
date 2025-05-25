@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import requests
-from documents_сreating.models.documents.invoice_for_payment import DocumentInvoiceForPayment
+from documents_сreating.models import DocumentInvoiceForPayment, DocumentUTD
 from documents_сreating.models.organization import Organization, Status
 
 def register_view(request):
@@ -47,12 +47,20 @@ def profile(request):
     documents_by_category = {}
 
     all_documents = []
-    for doc in DocumentInvoiceForPayment.objects.all():
+    for doc in DocumentInvoiceForPayment.objects.filter(user=request.user):
         all_documents.append({
             'type': 'Счет', 
             'instance': doc,
             'url_edit': 'invoice_edit',
             'url_add': 'invoice'
+            })
+        
+    for doc in DocumentUTD.objects.filter(user=request.user):
+        all_documents.append({
+            'type': 'УПД', 
+            'instance': doc,
+            'url_edit': 'utd_edit',
+            'url_add': 'utd'
             })
 
     #for doc in UtdDocument.objects.all():

@@ -5,8 +5,6 @@
 {% block head %}
 <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js" defer></script>
-<script src="{% static 'js/myjs/modal_filler.js' %}" defer></script>
-<script src="{% static 'js/myjs/select_rows.js' %}" defer></script>
 <script src="{% static 'js/myjs/bank_filler.js' %}" defer></script>
 <script src="{% static 'js/myjs/bank_rows_edit.js' %}" defer></script>
 <script src="{% static 'js/myjs/bank_add.js' %}" defer></script>
@@ -55,10 +53,6 @@
               <div class="card-body">
                 <form method="post" class="text-start">
         {% csrf_token %}
-        {% for field in form %}
-        {{ field.label }}
-        {{ field }}
-        {% endfor %}
         <div class="card mb-4 p-3">
             <div class="row">
                 <div class="col-md-12 mb-3">
@@ -84,13 +78,7 @@
                     <div class="card mb-4 p-3">
                         <h5>Информация об организации</h5>
                     <div class="form-group">
-                        <label for="{{ form.organization.id_for_label }}">{{ form.organization.label }} {% if form.organization|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.organization }}
-                        <div class="mt-2">
-                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrganizationModal" style="border-color:#f8a222; color:rgb(240, 146, 38);" data-modal-type="organization">
-                                        <i class="fas fa-edit"></i> Редактировать организацию
-                                    </button>
-                        </div>
                         {% if form.organization.help_text %}
                             <small class="form-text text-muted">{{ form.organization.help_text }}</small>
                         {% endif %}
@@ -109,15 +97,9 @@
                 </div>
                 <div class="col-md-12 mb-3">
                     <div class="card mb-4 p-3">
-                        <h5>Покупатель</h5>
+                        <h5>Информация о контрагенте</h5>
                     <div class="form-group">
-                        <label for="{{ form.counterparty.id_for_label }}">{{ form.buyer.label }} {% if form.buyer|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.buyer }}
-                        <div class="mt-2">
-                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCounterpartyModal" style="border-color:#f8a222; color:rgb(240, 146, 38);" data-modal-type="counterparty">
-                                        <i class="fas fa-edit"></i> Редактировать контрагента
-                                    </button>
-                        </div>
                         {% if form.buyer.help_text %}
                             <small class="form-text text-muted">{{ form.buyer.help_text }}</small>
                         {% endif %}
@@ -139,13 +121,7 @@
                     <div class="card mb-4 p-3">
                         <h5>Грузополучатель</h5>
                     <div class="form-group">
-                        <label for="{{ form.consignee.id_for_label }}">{{ form.consignee.label }} {% if form.consignee|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.consignee }}
-                        <div class="mt-2">
-                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addConsigneeModal" style="border-color:#f8a222; color:rgb(240, 146, 38);" data-modal-type="consignee">
-                                        <i class="fas fa-edit"></i> Редактировать грузополучателя
-                                    </button>
-                        </div>
                         {% if form.consignee.help_text %}
                             <small class="form-text text-muted">{{ form.consignee.help_text }}</small>
                         {% endif %}
@@ -179,7 +155,11 @@
                             <small class="form-text text-muted">{{ form.agreement.help_text }}</small>
                         {% endif %}
                         <br>
-
+                        
+                        <label for="{{ form.additional_info.id_for_label }}">{{ form.additional_info.label }} {% if form.additional_info|is_required %}<span style="color:red;">*</span>{% endif %}</label>
+                        {{ form.additional_info }}
+                        <br>
+                        
                         <label for="{{ form.currency.id_for_label }}">{{ form.currency.label }} {% if form.currency|is_required %}<span style="color:red;">*</span>{% endif %}</label>
                         {{ form.currency }}
                          <br>
@@ -291,84 +271,15 @@
     </div>
 
 </div>
-    <div class="modal fade" id="addOrganizationModal" tabindex="-1" aria-labelledby="addOrganizationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addOrganizationModalLabel">Добавить организацию</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="organizationForm" method="post" action="{% url 'add_organization' %}">
-                    {% csrf_token %}
-                    <input type="hidden" id="modal-prefix" name="modal-prefix" value="seller">
-                    <input type="hidden" id="id_organization-id" name="modal-organization-id" value="">
-                    <h5>Информация о организации</h5>
-                    {% include 'general_html_templates/organization_fields.html' with org_form=org_form %}
-                    <div class="text-left mt-3">
-                        <input type="hidden" name="modal_type" id="modal_type">
-                        <button type="submit" class="btn btn-success">Сохранить</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    </div>
 
-   <!-- Modal для добавления контрагента -->
-</div>
-<div class="modal fade" id="addCounterpartyModal" tabindex="-1" aria-labelledby="addCounterpartyModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title" id="addCounterpartyModalLabel">Добавить контрагента</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-              <form id="counterpartyForm" method="post" action="{% url 'add_organization' %}">
-                  {% csrf_token %}
-                  <input type="hidden" id="modal-prefix" name="modal-prefix" value="buyer">
-                  <input type="hidden" id="id_buyer-id" name="modal-counterparty-id" value="">
-                  <h5>Информация о контрагенте</h5>
-                  {% include 'general_html_templates/organization_fields.html' with org_form=counterparty_form %}
-                  <div class="text-left mt-3">
-                      <input type="hidden" name="modal_type" id="modal_type">
-                      <button type="submit" class="btn btn-success">Сохранить</button>
-                  </div>
-              </form>
-          </div>
-      </div>
-  </div>
-</div>
+{% include 'general_html_templates/organization_modal.html' with org_form=org_form %}
 
-<!-- Modal для добавления грузополучателя -->
-</div>
-<div class="modal fade" id="addConsigneeModal" tabindex="-1" aria-labelledby="addConsigneeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title" id="addConsigneeModalLabel">Добавить грузополучателя</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-              <form id="consigneeForm" method="post" action="{% url 'add_organization' %}">
-                  {% csrf_token %}
-                  <input type="hidden" id="modal-prefix" name="modal-prefix" value="consignee">
-                  <input type="hidden" id="cd_Consignee-id" name="modal-consignee-id" value="">
-                  <h5>Информация о грузополучателе</h5>
-                  {% include 'general_html_templates/organization_fields.html' with org_form=consignee_form %}
-                  <div class="text-left mt-3">
-                      <input type="hidden" name="modal_type" id="modal_type">
-                      <button type="submit" class="btn btn-success">Сохранить</button>
-                  </div>
-              </form>
-          </div>
-      </div>
-  </div>
-</div>
+{% include 'general_html_templates/organization_modal.html' with org_form=counterparty_form %}
+
+{% include 'general_html_templates/organization_modal.html' with org_form=consignee_form %}
 
 
-      <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -378,7 +289,7 @@
                 <div class="modal-body">
                     <form id="bankForm" method="post" action="{% url 'add_bank_organization' %}">
                         {% csrf_token %}
-                        <input type="hidden" id="modal-prefix" name="modal-prefix" value="organization_bank">
+                        <input type="hidden" id="modal-prefix" name="modal-prefix" value="{{ bank_org.prefix }}">
                         <h5>Банковские реквизиты</h5>
                         {% include 'general_html_templates/bank_fields.html' with bank=bank_org %}
                         <div class="text-left mt-3">
@@ -390,7 +301,7 @@
         </div>
     </div>
 
-      <div class="modal fade" id="addBankCounModal" tabindex="-1" aria-labelledby="addBankCounModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addBankCounModal" tabindex="-1" aria-labelledby="addBankCounModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -400,7 +311,7 @@
                 <div class="modal-body">
                     <form id="bankCounForm" method="post" action="{% url 'add_bank_organization' %}">
                         {% csrf_token %}
-                        <input type="hidden" id="modal-prefix" name="modal-prefix" value="bank_coun">
+                        <input type="hidden" id="modal-prefix" name="modal-prefix" value="{{ bank_coun.prefix }}">
                         <h5>Банковские реквизиты</h5>
                         {% include 'general_html_templates/bank_fields.html' with bank=bank_coun %}
                         <div class="text-left mt-3">

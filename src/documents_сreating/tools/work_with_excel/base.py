@@ -47,7 +47,7 @@ class BaseExcelDocumentCreate(ABC):
             return "kpp"
         return ""
 
-    def fill_doc(self, document: BaseModel, sheet: Worksheet, offset: list, inn_field: str) -> None:
+    def fill_doc(self, document: BaseModel, sheet: Worksheet, offset: list, org_field: str) -> None:
         """
         Заполняет лист excel данными из document сопоставляя по self.document_dict
         """
@@ -68,29 +68,40 @@ class BaseExcelDocumentCreate(ABC):
 
         if "Images" in self.document_dict and document.is_stamp:
 
-            organization = Organization.objects.filter(inn=self.get_nested_attribute(document, inn_field)).first()
+            organization = Organization.objects.filter(id=self.get_nested_attribute(document, org_field)).first()
 
             #Добавление печати и подписи
             if organization:
                 for image in self.document_dict["Images"]:
                     if self.get_nested_attribute(organization, image["type"]):
+                        
                         self.add_image(sheet, self.get_nested_attribute(organization, image["type"]).name, image["width"], image["height"], self.get_cell_ref(image["cell"], offset))
 
                 #!!Необходимо добавить заполнение КПП если ИНН отсутствует
         if "Concatenation" in self.document_dict:
+            if "Custom_data" in self.document_dict and "separator" in self.document_dict["Custom_data"]:
+                separator = self.document_dict["Custom_data"]["separator"]
+            else:
+                separator = "\n"
             for key, cell_ref in self.document_dict["Concatenation"].items():
                 if self.get_nested_attribute(document, key):
+                    value = str(self.get_nested_attribute(document, key))
+                    inn_kpp = self.inn_or_kpp(value)
+                    if inn_kpp == "inn":
+                        value = "ИНН " + value
+                    elif inn_kpp == "kpp":
+                        value = "КПП" + value
                     cell = self.get_cell_ref(cell_ref, offset)
                     if sheet[cell].value != None:
                         #sheet[cell].value += f", {self.get_nested_attribute(document, key)}"
                         if sheet.values == "":
-                            sheet[cell].value += f"{self.get_nested_attribute(document, key)}"
+                            sheet[cell].value += value
                         else:
-                            sheet[cell].value += f"\n{self.get_nested_attribute(document, key)}"
+                            sheet[cell].value += f"{separator}{value}"
                         value = sheet[cell].value
                         self.row_height_from_content(sheet, value, cell)
                     else:
-                        sheet[cell] = str(self.get_nested_attribute(document, key))
+                        sheet[cell] = value
                         value = sheet[cell].value
                         self.row_height_from_content(sheet, value, cell)
 

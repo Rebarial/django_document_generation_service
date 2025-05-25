@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .api.create_document import DocumentUPDViewSet, DocumentInvoiceForPaymentViewSet
+from .api.create_document import DocumentUTDViewSet, DocumentInvoiceForPaymentViewSet
 from rest_framework import routers
 from documents_сreating.views import (
     add_organization,
@@ -18,7 +18,7 @@ from documents_сreating.views import (
 
 
 router = routers.DefaultRouter()
-router.register(r"upd", DocumentUPDViewSet)
+router.register(r"upd", DocumentUTDViewSet)
 router.register(r"invoiceforpayment", DocumentInvoiceForPaymentViewSet)
 
 urlpatterns = [

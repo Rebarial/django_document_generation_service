@@ -1,10 +1,11 @@
 from django import forms
-from django.core.validators import RegexValidator
 from documents_сreating.models.documents.invoice_for_payment import DocumentInvoiceForPayment, InvoiceForPaymentItem
 from documents_сreating.models.reference import Currency, VatRate
 from documents_сreating.models.organization import Organization, BankDetails, Status
 from datetime import date
 from django.forms import modelformset_factory
+from documents_сreating.widgets import OrganizationWidget
+
 
 class InvoiceDocumentForm(forms.ModelForm):
 
@@ -74,41 +75,47 @@ class InvoiceDocumentForm(forms.ModelForm):
         required=False
     )
 
-    try:
-        seller_status = Status.objects.filter(name="Seller").first()
-    except:
-        seller_status = None
+    seller_status = Status.objects.filter(name="Seller").first() or None
     
     organization = forms.ModelChoiceField(
         queryset=Organization.objects.filter(status_org__status=seller_status).distinct(),
-        widget=forms.Select(attrs={'class': 'form-select select2'}),
+        widget=OrganizationWidget(attrs={
+            'label': 'Организация',
+            'button': 'Редактировать организацию',
+            'prefix': 'seller',
+            'id': "id_seller",
+            }),
         empty_label='Новая организация',
         label='Организация',
-        required=True
+        required=True,
+        
     )
 
-    try:
-        buyer_status = Status.objects.filter(name="Buyer").first()
-    except:
-        buyer_status = None
+    buyer_status = Status.objects.filter(name="Buyer").first() or None
 
     buyer = forms.ModelChoiceField(
         queryset=Organization.objects.filter(status_org__status=buyer_status).distinct(),
-        widget=forms.Select(attrs={'class': 'form-select select2'}),
+        widget=OrganizationWidget(attrs={
+            'label': 'Контрагент',
+            'button': 'Редактировать контрагента',
+            'prefix': 'buyer',
+            }),
         empty_label='Новый контрагент',
         label='Контрагент',
         required=True
     )
-    try:
-        consignee_status = Status.objects.filter(name="Consignee").first()
-    except:
-        consignee_status = None
+    
+    consignee_status = Status.objects.filter(name="Consignee").first() or None
 
     consignee = forms.ModelChoiceField(
         queryset=Organization.objects.filter(status_org__status=consignee_status).distinct(),
-        widget=forms.Select(attrs={'class': 'form-select select2'}),
-        empty_label='Новый Грузополучатель',
+        widget=OrganizationWidget(attrs={
+            'label': 'Грузополучатель',
+            'button': 'Редактировать грузополучателя',
+            'prefix': 'consignee',
+            }),
         label='Грузополучатель',
+        empty_label='Новый Грузополучатель',
         required=True
     )
 
@@ -124,7 +131,7 @@ class InvoiceDocumentForm(forms.ModelForm):
         queryset=BankDetails.objects,
         widget=forms.Select(attrs={'class': 'form-select select2'}),
         empty_label='Новый банк',
-        label='Банк покупателя',
+        label='Банк контрагента',
         required=True
     )
 

@@ -4,6 +4,7 @@ from openpyxl import load_workbook
 from ..layout_parameters_dictionary.invoice_for_payment import invoice_for_payment_dict
 from io import BytesIO
 from typing import Callable
+from openpyxl.styles import Font
 
 class InvoiceForPaymentExcelDocumentCreate(BaseExcelDocumentCreate):
 
@@ -60,7 +61,29 @@ class InvoiceForPaymentExcelDocumentCreate(BaseExcelDocumentCreate):
         cell = self.get_cell_ref(self.document_dict["Custom_data"]["vat_rate_sum"], offset)
         sheet[cell] = "Итого (" + document.vat_rate.name + "):\n"
 
-        fill_dict = self.fill_doc(document, sheet, offset, self.document_dict["Custom_data"]["inn_field"])
+        row_number = 0
+
+        if (self.get_nested_attribute(document, 'organization.name')):
+            row_number += 1
+
+        if (self.get_nested_attribute(document, 'organization.address')):
+            row_number += 1
+            sheet[f'A{row_number}'].font = Font(bold=False)
+
+        if (self.get_nested_attribute(document, 'organization.inn')):
+            row_number += 1  
+            sheet[f'A{row_number}'] = 'ИНН ' + sheet[f'A{row_number}'].value
+            sheet[f'A{row_number}'].font = Font(bold=False)
+
+        if (self.get_nested_attribute(document, 'organization.ogrn')):
+            row_number += 1  
+            if (self.get_nested_attribute(document, 'is_ip')):
+                sheet[f'A{row_number}'] = 'ОГРНИП ' + sheet[f'A{row_number}'].value
+            else:
+                sheet[f'A{row_number}'] = 'ОГРН ' + sheet[f'A{row_number}'].value
+            sheet[f'A{row_number}'].font = Font(bold=False)
+
+        fill_dict = self.fill_doc(document, sheet, offset, self.document_dict["Custom_data"]["org_field"])
 
         #Добавляем разрывы в зависимости от занимаемого места
         if "Break_points" in self.document_dict:

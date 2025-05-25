@@ -31,6 +31,10 @@ function addRowDropLine(formId, modalId, prefix) {
                     {
                         select = document.getElementById('id_buyer');
                     }
+                    else if(i == 3)
+                        {
+                            select = document.getElementById('id_consignor');
+                        }
                     else if(i == 4)
                     {
                         select = document.getElementById('id_consignee');

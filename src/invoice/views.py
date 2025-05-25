@@ -30,7 +30,6 @@ class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
     def get_object(self, queryset=None):
-        """Получение текущего объекта по переданному id_doc"""
         obj = None
         id_doc = self.kwargs.get('id_doc')
         if not id_doc:
@@ -89,10 +88,9 @@ class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
         existing_obj = self.get_object()
 
         if existing_obj:
-            form = InvoiceDocumentForm(self.request.POST, instance=existing_obj)
-            if not form.is_valid():  # Повторно проверяем валидность
+            form = InvoiceDocumentForm(self.request.POST, instance=existing_obj, request = self.request)
+            if not form.is_valid():  
                 return self.form_invalid(form)
-            #form.instance = existing_obj
 
         self.object = form.save(commit=False)
         self.object.user = self.request.user

@@ -10,6 +10,7 @@ urlpatterns = [
     path('', include('documents_сreating.urls')),
     path('users/', include('users.urls')),
     path('invoice/', include('invoice.urls')),
+    path('utd/', include('utd.urls')),
     path('utd/', UtdDocumentCreateView.as_view(), name='utd'),
     path('add-organization/', add_organization, name='add_organization'),
     path('fetch_organization_data/', fetch_organization_data, name='fetch_organization_data'),

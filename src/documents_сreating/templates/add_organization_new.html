@@ -46,7 +46,7 @@
                 <form method="post" class="text-start" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="card mb-4 p-3">
-            {% include 'general_html_templates/organization_fields.html' with org_form=org_form %}
+          {% include 'general_html_templates/organization_fields.html' with org_form=org_form %}
                     <div class="card mb-4 p-3">
                     {% include 'general_html_templates/bank_fields.html' with bank=bank_form %}
             </div>

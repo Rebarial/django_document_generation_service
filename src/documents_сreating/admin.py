@@ -1,35 +1,25 @@
 from django.contrib import admin
 from .models import (
-    Organization, DocumentUPD, PaymentDocument, 
-    ShipmentDocument, UPDItem, VatRate, 
+    Organization, DocumentUTD, UTDItem, VatRate, 
     Currency, DocumentType, SellerStatus,
     DocumentInvoiceForPayment, InvoiceForPaymentItem,
     BankDetails, Status,
     StatusOrganization,
 )
 
-class PaymentDocumentInline(admin.TabularInline):
-    model = PaymentDocument
-    extra = 0
-    fields = ('number', 'date')
 
-class ShipmentDocumentInline(admin.TabularInline):
-    model = ShipmentDocument
+class UTDItemInline(admin.TabularInline):
+    model = UTDItem
     extra = 0
-    fields = ('name', 'number', 'date')
+    fields = ('code', 'name', 'quantity', 'price', 'sum')
 
-class UPDItemInline(admin.TabularInline):
-    model = UPDItem
-    extra = 0
-    fields = ('code', 'name', 'quantity', 'price', 'amount')
-
-@admin.register(DocumentUPD)
-class DocumentUPDAdmin(admin.ModelAdmin):
-    inlines = [PaymentDocumentInline, ShipmentDocumentInline, UPDItemInline]
-    list_display = ('invoice_number', 'invoice_date', 'seller_name', 'customer_name')
-    list_filter = ('invoice_number','invoice_date', 'seller_name', 'customer_name')
-    search_fields = ('invoice_number', 'seller_name', 'customer_name')
-    date_hierarchy = 'invoice_date'
+@admin.register(DocumentUTD)
+class DocumentUTDAdmin(admin.ModelAdmin):
+    inlines = [UTDItemInline]
+    list_display = ('number', 'date', 'seller', 'buyer')
+    list_filter = ('number','date', 'seller', 'buyer')
+    search_fields = ('number', 'seller', 'buyer')
+    date_hierarchy = 'date'
 
 class InvoiceForPaymentItemInLine(admin.TabularInline):
     model = InvoiceForPaymentItem

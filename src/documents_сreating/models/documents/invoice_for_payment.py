@@ -1,6 +1,6 @@
 from django.db import models
 from ..base import BaseModel
-from ..reference import VatRate, Currency, DocumentType, SellerStatus
+from ..reference import VatRate, Currency
 from .base import BaseDocument
 from django.conf import settings
 
@@ -29,8 +29,8 @@ class DocumentInvoiceForPayment(BaseDocument):
     organization = models.ForeignKey('Organization', on_delete=models.CASCADE, related_name='organization', verbose_name='Организация')
     organization_bank = models.ForeignKey('BankDetails', on_delete=models.CASCADE, related_name='organization_bank_details', verbose_name='Реквизиты банка организации')
 
-    buyer = models.ForeignKey('Organization', on_delete=models.CASCADE, related_name='buyer', verbose_name='Организация')
-    buyer_bank = models.ForeignKey('BankDetails', on_delete=models.CASCADE, related_name='buyer_bank_details', verbose_name='Реквизиты банка покупателя')
+    buyer = models.ForeignKey('Organization', on_delete=models.CASCADE, related_name='buyer', verbose_name='Контрагент')
+    buyer_bank = models.ForeignKey('BankDetails', on_delete=models.CASCADE, related_name='buyer_bank_details', verbose_name='Реквизиты банка контрагента')
 
     consignee = models.ForeignKey('Organization', on_delete=models.CASCADE, related_name='consignee', verbose_name='Грузополучатель')
 

@@ -44,6 +44,6 @@ function bank_rows_by_organization(organization_row, bank_row){
     });
 }
 
-bank_rows_by_organization('#id_organization','#id_organization_bank')
+bank_rows_by_organization('#id_seller','#id_organization_bank')
 
 bank_rows_by_organization('#id_buyer','#id_buyer_bank')

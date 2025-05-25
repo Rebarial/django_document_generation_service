@@ -54,7 +54,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const price = parseFloat(row.querySelector(".price input").value) || 0;
         //const discount = parseFloat(discountInpu.value) || 0;
 
-        let discount = discountInpu.value;
+        let discount = 0
+
+        if (discountInpu){
+        discount = discountInpu.value;
 
         if (discount.endsWith('%')) { 
             discount = discount.slice(0, -1); 
@@ -62,6 +65,8 @@ document.addEventListener("DOMContentLoaded", function () {
             discount = (discount / 100) * (quantity * price); 
         } else {
             discount = parseFloat(discount) || 0; 
+        }
+
         }
 
         let ndsValue = 0;

@@ -1,8 +1,8 @@
-from ..models import DocumentUPD, DocumentInvoiceForPayment
+from ..models import DocumentUTD, DocumentInvoiceForPayment
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from ..serializers import DocumentUPDSerializer, DocumentInvoiceForPaymentSerializer
-from ..tools.work_with_excel.upd import upd_excel_document_create
+from ..serializers import DocumentUTDSerializer, DocumentInvoiceForPaymentSerializer
+from ..tools.work_with_excel.utd import utd_excel_document_create
 from ..tools.work_with_excel.invoice_for_payment import invoice_for_payment_excel_document_create
 from django.http import HttpResponse
 from typing import Callable
@@ -25,15 +25,15 @@ class DocumentViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = f'attachment; filename=test UPD.pdf'
         return response
 
-class DocumentUPDViewSet(DocumentViewSet):
-    queryset = DocumentUPD.objects.all()
-    serializer_class = DocumentUPDSerializer
-    model = DocumentUPD
-    document_create = upd_excel_document_create
+class DocumentUTDViewSet(DocumentViewSet):
+    queryset = DocumentUTD.objects.all()
+    serializer_class = DocumentUTDSerializer
+    model = DocumentUTD
+    document_create = utd_excel_document_create
 
     @action(detail=True, methods=['get'], url_path='libre', url_name='libre')
     def create_document_libre(self, request, pk=None):
-        return self.create_doc(pk, upd_excel_document_create.toPDF_libre)
+        return self.create_doc(pk, utd_excel_document_create.toPDF_libre)
 
 class DocumentInvoiceForPaymentViewSet(DocumentViewSet):
     queryset = DocumentInvoiceForPayment.objects.all()
@@ -43,4 +43,4 @@ class DocumentInvoiceForPaymentViewSet(DocumentViewSet):
 
     @action(detail=True, methods=['get'], url_path='libre', url_name='libre')
     def create_document_libre(self, request, pk=None):
-        return self.create_doc(pk, upd_excel_document_create.toPDF_libre)
+        return self.create_doc(pk, utd_excel_document_create.toPDF_libre)

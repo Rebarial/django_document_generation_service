@@ -10,7 +10,6 @@ function addBankRowDropLine(formId, modalId, rows_id, OrganizationSelect) {
 
         const bankSelect = document.getElementById(rows_id);
         const selectedBank = bankSelect.value;
-    
         if (!selectedOrganization) {
             alert('Пожалуйста, выберите организацию из списка');
             return;
@@ -53,6 +52,5 @@ function addBankRowDropLine(formId, modalId, rows_id, OrganizationSelect) {
     });
 }
 
-//addRowDropLine('organizationForm', '#addOrganizationModal', 'organization')
 addBankRowDropLine('bankCounForm', '#addBankCounModal', 'id_buyer_bank', 'id_buyer')
-addBankRowDropLine('bankForm', '#addBankModal', 'id_organization_bank', 'id_organization')
+addBankRowDropLine('bankForm', '#addBankModal', 'id_organization_bank', 'id_seller')

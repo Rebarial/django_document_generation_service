@@ -1,0 +1,284 @@
+<div class="modal fade" id="add{{ org_form.prefix }}Modal" tabindex="-1" aria-labelledby="add{{ org_form.prefix }}ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add{{ org_form.prefix }}ModalLabel">Добавить организацию</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="{{ org_form.prefix }}Form" method="post" action="{% url 'add_organization' %}">
+                    {% csrf_token %}
+                    <input type="hidden" id="modal-prefix" name="modal-prefix" value="{{ org_form.prefix }}">
+                    <input type="hidden" id="id_organization-id" name="modal-organization-id" value="">
+                    <h5>Информация о организации</h5>
+                    {% include 'general_html_templates/organization_fields.html' with org_form=org_form %}
+                    <div class="text-left mt-3">
+                        <input type="hidden" name="modal_type" id="modal_type">
+                        <button type="submit" class="btn btn-success">Сохранить</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+<div class="modal" id="myModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Modal Heading</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+          Modal body..
+        </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+if (typeof addRowDropLine === 'undefined') {
+const addRowDropLine = (formId, modalId, prefix) =>{
+    document.getElementById(formId).addEventListener('submit', function(e) {
+        e.preventDefault();
+        selectId = 'id_' + prefix;
+        const formData = new FormData(this);
+        formData.append('org_id', document.getElementById(selectId).value);
+        const modalType = document.getElementById('modal_type').value;
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).then(response => response.json()).then(data => {
+            if (data.errors) {
+                alert('Ошибка: ' + JSON.stringify(data.errors));
+            } else 
+            {
+                document.querySelector(modalId + ' .btn-close').click();
+
+                
+                for (let i = 1; i <= 6; i++) {
+                    let select = null
+                    if (i == 1){
+                        select = document.getElementById('id_seller');
+                    }
+                    else if (i == 2)
+                    {
+                        select = document.getElementById('id_buyer');
+                    }
+                    else if(i == 3)
+                        {
+                            select = document.getElementById('id_consignor');
+                        }
+                    else if(i == 4)
+                    {
+                        select = document.getElementById('id_consignee');
+                    }
+                    else if(i == 5)
+                    {
+                        select = document.getElementById('id_document_seller');
+                    }
+                    else if(i == 6)
+                    {
+                        select = document.getElementById('id_document_buyer');
+                    }
+                    else {
+                        continue;
+                    }
+
+                    optionNotFound = true
+                    if (select) {
+                    for (let j = 0; j < select.options.length; j++) {
+                        if (select.options[j].value == data.id) {
+                            optionNotFound = false;
+                            let selectedOption = select.options[j];
+                            if (data.statuses.includes(i)){
+                                let result_str = ""
+                                if (data.name)
+                                    result_str += data.name + " "
+                                if (data.inn) 
+                                    result_str += data.inn
+
+                                selectedOption.textContent = result_str;
+                            }
+                            else {
+                                select.remove(j);
+                            }
+                            break;
+                        }
+                    }
+                    if (optionNotFound && data.statuses.includes(i)) 
+                    {
+                        let result_str = ""
+                        if (data.name)
+                            result_str += data.name + " "
+                        if (data.inn) 
+                            result_str += data.inn
+
+                        let option = new Option(result_str, data.id, true, true);
+                        select.add(option);
+                    }
+                }
+                    
+                }
+
+            }
+        })
+    });
+}
+window.addRowDropLine = addRowDropLine;
+}
+
+addRowDropLine('{{ org_form.prefix }}Form', '#add{{ org_form.prefix }}Modal', '{{ org_form.prefix }}')
+</script>
+<script>
+if (typeof handleModalEvent === 'undefined') {
+        const statuses_id = {
+            'seller': 1,
+            'buyer': 2,
+            'consignor': 3,
+            'consignee': 4,
+            'document_seller': 5,
+            'document_buyer': 6,
+        };
+        const handleModalEvent = (modalSelector, orgIdInputSelector, prefix, default_id)  =>{
+    $(modalSelector).on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget),
+            modalType = button.data('modal-type'),
+            selectedOrgID = $(orgIdInputSelector).val(),
+            form = $(this).find('form');
+        
+        if (!selectedOrgID){
+            form.find(prefix + '-id').val('');
+            form.find(prefix + '-name').val('');
+            form.find(prefix + '-inn').val('');
+            form.find(prefix + '-kpp').val('');
+            let isIPValue = 'False';
+            form.find(prefix + '-is_ip').val(isIPValue); 
+            form.find(prefix + '-ogrn').val('');
+            form.find(prefix + '-address').val('');
+            form.find(prefix + '-telephone').val('');
+            form.find(prefix + '-fax').val('');
+            form.find(prefix + '-director_name').val('');
+            form.find(prefix + '-director_position').val('');
+            form.find(prefix + '-accountant_name').val('');
+            form.find(prefix + '-conventional_name').val('');
+            form.find(prefix + '-stamp').val('');
+            form.find(prefix + '-signature').val('');
+            document.getElementById(prefix + '-stamp_url').src = '';
+            document.getElementById(prefix + '-signature_url').src = '';
+
+            document.getElementById(prefix + '-signature-preview').innerHTML = '<small>Новое изображение:</small>';
+            document.getElementById(prefix + '-stamp-preview').innerHTML = '<small>Новое изображение:</small>';
+
+            form.find(`${prefix}-statuses input[type="checkbox"]`).each(function() {
+                const value = Number($(this).val()); 
+
+                if (default_id == value) {
+                    this.checked = true;
+                } else {
+                    this.checked = false;
+                }
+            });
+            document.getElementById('modal_type').value = modalType;
+            return
+        }
+        // Выполнение AJAX-запроса для получения данных
+        $.ajax({
+            url: '/fetch_organization_data',
+            type: 'GET',
+            data: {'org_id': selectedOrgID},
+            success: function(response) {
+                // Заполняем поля формы значениями из API
+                form.find(prefix + '-id').val(response.id);
+                form.find(prefix + '-name').val(response.name);
+                form.find(prefix + '-inn').val(response.inn);
+                form.find(prefix + '-kpp').val(response.kpp);
+                let isIPValue = response.is_ip ? 'True' : 'False';
+                form.find(prefix + '-is_ip').val(isIPValue); 
+                form.find(prefix + '-ogrn').val(response.ogrn);
+                form.find(prefix + '-address').val(response.address);
+                form.find(prefix + '-telephone').val(response.telephone);
+                form.find(prefix + '-fax').val(response.fax);
+                form.find(prefix + '-director_name').val(response.director_name);
+                form.find(prefix + '-director_position').val(response.director_position);
+                form.find(prefix + '-accountant_name').val(response.accountant_name);
+                form.find(prefix + '-conventional_name').val(response.conventional_name);
+                form.find(prefix + '-stamp').val('');
+                form.find(prefix + '-signature').val('');
+
+                document.getElementById(prefix + '-stamp_url').src = response.stamp_url;
+                document.getElementById(prefix + '-signature_url').src = response.signature_url;
+                
+                document.getElementById(prefix + '-signature-preview').innerHTML = '<small>Новое изображение:</small>';
+                document.getElementById(prefix + '-stamp-preview').innerHTML = '<small>Новое изображение:</small>';
+            
+
+                const selectedStatuses = response.statuses || [];
+                form.find(`${prefix}-statuses input[type="checkbox"]`).each(function() {
+                    const value = Number($(this).val());
+                    // Проверка значения статуса
+                    if (selectedStatuses.includes(value)) {
+                        this.checked = true;
+                    } else {
+                        this.checked = false;
+                    }
+                });
+
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert(errorThrown)
+                form.find(prefix + '-id').val('');
+                form.find(prefix + '-name').val('');
+                form.find(prefix + '-inn').val('');
+                form.find(prefix + '-kpp').val('');
+                let isIPValue = 'False';
+                form.find(prefix + '-is_ip').val(isIPValue); 
+                form.find(prefix + '-ogrn').val('');
+                form.find(prefix + '-address').val('');
+                form.find(prefix + '-telephone').val('');
+                form.find(prefix + '-fax').val('');
+                form.find(prefix + '-director_name').val('');
+                form.find(prefix + '-director_position').val('');
+                form.find(prefix + '-accountant_name').val('');
+                form.find(prefix + '-conventional_name').val('');
+                form.find(prefix + '-stamp').val('');
+                form.find(prefix + '-signature').val('');
+                document.getElementById(prefix + '-stamp_url').src = '';
+                document.getElementById(prefix + '-signature_url').src = '';
+                
+                document.getElementById(prefix + '-signature-preview').innerHTML = '<small>Новое изображение:</small>';
+                document.getElementById(prefix + '-stamp-preview').innerHTML = '<small>Новое изображение:</small>';
+
+                let statusesCheckboxes = $('input[name="' + prefix + '_statuses[]"]');
+
+                form.find(`${prefix}-statuses input[type="checkbox"]`).each(function() {
+                    const value = Number($(this).val()); 
+    
+                    if (default_id == value) {
+                        this.checked = true;
+                    } else {
+                        this.checked = false;
+                    }
+                });
+                statusesCheckboxes.prop('checked', false)
+            }
+        });
+    document.getElementById('modal_type').value = modalType;
+    }
+    );
+        }
+        window.handleModalEvent = handleModalEvent;
+        window.statuses_id = statuses_id;
+};
+handleModalEvent('#add{{ org_form.prefix }}Modal', '#id_{{ org_form.prefix }}', '#id_{{ org_form.prefix }}', statuses_id['{{ org_form.prefix }}']);
+
+</script>

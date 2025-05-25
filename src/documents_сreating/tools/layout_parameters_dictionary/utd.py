@@ -1,17 +1,18 @@
-upd_dict = {
+utd_dict = {
     "Break_points": [
         24, 29, 32, 
     ],
     "Raw_data": {
-        "invoice_number": ("AP", 2),
-        "correction_number": ("AP", 4),
-        "seller_address": ("AP", 7),
-        "seller_inn": ("AP", 8),
-        "DocumentUPD": ("AT", 11),
-        "ShipmentDocument": ("AX", 12),
-        "customer_name": ("DL", 6),
-        "customer_address": ("DL", 7),
-        "customer_inn": ("DL", 8),
+        "number": ("AP", 2),
+        "corr_number": ("AP", 4),
+        "seller.address": ("AP", 7),
+        "seller.inn": ("AP", 8),
+        "seller.director_name": ("BS",25),
+        "payment_document": ("AT", 11),
+        "shipping_document": ("AX", 12),
+        "buyer.name": ("DL", 6),
+        "buyer.address": ("DL", 7),
+        "buyer.inn": ("DL", 8),
         "currency": ("DP", 9),
         "transfer_basis": ("AW", 31),
         "transport_info": ("AJ", 33),
@@ -28,16 +29,16 @@ upd_dict = {
     },
     "Concatenation": 
     {
-        "seller_status": ("AP", 6),
-        "seller_name": ("AP", 6),
-        "consignee_name": ("AP", 10),
-        "consignee_address": ("AP", 10),
-        "document_seller_name": ("A", 46),
-        "document_seller_inn": ("A", 46),
-        "document_seller_kpp": ("A", 46),
-        "document_customer_name": ("CF", 46),
-        "document_customer_inn": ("CF", 46),
-        "document_customer_kpp": ("CF", 46),
+        #"seller.status": ("AP", 6),
+        "seller.name": ("AP", 6),
+        "consignee.name": ("AP", 10),
+        "consignee.address": ("AP", 10),
+        "document_seller.name": ("A", 46),
+        "document_seller.inn": ("A", 46),
+        "document_seller.kpp": ("A", 46),
+        "document_buyer.name": ("CF", 46),
+        "document_buyer.inn": ("CF", 46),
+        "document_buyer.kpp": ("CF", 46),
     },
     "Images":(
             {
@@ -69,16 +70,18 @@ upd_dict = {
         {
             "items_model_name": "items_docs", #Название таблицы из которой будут браться строки
             "cell_itmes_number": 22, #Номер строки, с которой начинается вставка
+            "sum_cell": ("DQ", 23),
             "items_content": #Содержание вставки ключ – название поля модели, значение – буква ячейки
             {
                 "code": "A",
                 "name": "R",
                 "type_code": "AQ",
+                "unit": "BA",
                 "quantity": "BN",
                 "price": "BU",
-                "amount": "CE",
-                "country": "ED",
-                "ET": "gtd_number"
+                "sum": "DQ",
+                "country": "EJ",
+                "gtd_number": "ET"
             },
         },
     ),
@@ -97,17 +100,13 @@ upd_dict = {
             "receipt_date": ("ET", 38),
         },
         "fromat":{
-            "invoice_date": ("BK", 2),
-            "correction_date": ("BK", 4),
+            "date": ("BK", 2),
+            "corr_date": ("BK", 4),
         }  
     },
     "Custom_data": #Представление данных, которые будут обрабатываться в конкретном документе.
     {
-        "ShipmentDocument":
-        {
-            "ShipmentDocument": ("AX", 12),
-            "ShipmentDocumentDate": ("AX", 12),
-            "ShipmentDocumentNumber": ("AX", 12),
-        },   
+        "org_field": "seller.id",
+        "separator": ", ",
     }
 }

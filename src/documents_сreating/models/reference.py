@@ -25,6 +25,9 @@ class Currency(BaseModel):
         verbose_name_plural = 'Валюты'
         ordering = ['code']
 
+    def __str__(self):
+        return f'{self.name}, {self.code}'
+
 class DocumentType(BaseModel):
     code = models.CharField(max_length=10, verbose_name='Код')
     name = models.CharField(max_length=100, verbose_name='Наименование')

@@ -10,9 +10,9 @@ def global_nav_context(request):
                 'all': ['invoice_document', 'invoice']
             },
             'УПД': {
-                'list': 'invoice_document',
-                'new': 'invoice',
-                'all' : []
+                'list': 'utd_document',
+                'new': 'utd',
+                'all' : ['utd', 'utd_document']
             },
         },
         'services' :{
