@@ -7,12 +7,12 @@ def global_nav_context(request):
             'Счет': {
                 'list': 'invoice_document',
                 'new': 'invoice',
-                'all': ['invoice_document', 'invoice']
+                'all': ['invoice_document', 'invoice', 'invoice_edit']
             },
             'УПД': {
                 'list': 'utd_document',
                 'new': 'utd',
-                'all' : ['utd', 'utd_document']
+                'all' : ['utd', 'utd_document', 'utd_edit']
             },
         },
         'services' :{
