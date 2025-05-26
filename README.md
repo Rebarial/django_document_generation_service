@@ -37,7 +37,7 @@ docker-compose up --build --force-recreate -d
  - Организации
  - Документы УПД
 
-## Структура и функции
+## Структура и функции (лучше посмотреть в Руководство пользователя.docx)
  - Сервиc: src\documents_creating
    - Шаблоны эксель документов: templates\excel_templates
    - Словари для заполнения документа: tools\layout_parameters_dictionary
