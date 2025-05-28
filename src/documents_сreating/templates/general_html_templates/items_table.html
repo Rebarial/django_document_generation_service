@@ -1,0 +1,52 @@
+{{ formset.management_form }}
+
+<div class="card p-3" style="overflow: scroll!important;">
+    <h5 class="mb-3">Состав счета</h5>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width: 30px; min-width: 30px;">#</th>
+                <th style="width: 30px; min-width: 30px;"></th>
+                
+                {%- for key, settings in column_settings.items() %}<!-- Перебираем наши настройки -->
+                    <th style="min-width: {{ settings.width }}; width: auto;">{{ settings.label }}</th>
+                {%- endfor %}
+                
+                <th style="width: 30px; min-width: 30px;"></th>
+            </tr>
+        </thead>
+        
+        <tbody id="formset-body">
+            {% for form in formset %}
+                <tr class="form-row">
+                    <td class="row-number">{{ forloop.counter }}</td>
+                    {{ form.id }}
+                    <td>
+                        <button type="button" class="btn  drag-handle" title="Перетащить"><i class="fas fa-arrows-alt"></i></button>
+                        <button type="button" class="btn btn-success add-row"><i class="fa-solid fa-plus"></i></button>
+                        <button type="button" class="btn remove-row"><i class="fa-solid fa-minus"></i></button>
+                    </td>
+                    
+                    {%- for key, _ in column_settings.items() %}<!-- Формируем ячейки по полям формы -->
+                        <td>{{ form[key] }}</td>
+                    {%- endfor %}
+                    
+                    <td>
+                        <button type="button" class="btn  drag-handle" title="Перетащить"><i class="fas fa-arrows-alt"></i></button>
+                        <button type="button" class="btn btn-success add-row"><i class="fa-solid fa-plus"></i></button>
+                        <button type="button" class="btn remove-row"><i class="fa-solid fa-minus"></i></button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="d-flex align-items-center" style="gap: 10px;">
+        <button type="button" class="btn btn-primary mb-3 w-md-30 w-sm-100 mt-3" id="duplicate-last-row">
+            <i class="fas fa-copy"></i> Дублировать последнюю строку
+        </button>
+        <button type="button" class="btn btn-success mt-3 add-new-last-row" id="add-new-last-row">Добавить строку</button>
+    </div>
+    <p><span style="font-weight: 700; font-size: 18px;">Итого:</span> <span style="font-weight: 700; font-size: 18px;" id="total-sum"></span></p>
+    <p><span style="font-weight: 700; font-size: 18px;">Сумма НДС:</span> <span style="font-weight: 700; font-size: 18px;" id="total-nds"></span></p>
+</div>
