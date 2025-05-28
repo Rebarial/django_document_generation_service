@@ -9,3 +9,11 @@ class OrganizationWidget(forms.Select):
             attrs = {}
 
         super().__init__(attrs)
+
+
+
+class PaymentDocumentWidget(forms.TextInput):
+    template_name = 'widgets/payment_document_widget.html'
+    
+    def render(self, name, value, attrs=None, renderer=None):
+        return super().render(name, value, attrs)

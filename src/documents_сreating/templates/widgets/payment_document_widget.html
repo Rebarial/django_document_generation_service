@@ -1,0 +1,51 @@
+{% load static %}
+<div class="widget-payment-document">
+    <h4>Заполните данные платежных документов:</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">№ документа</th>
+                <th scope="col">Дата</th>
+            </tr>
+        </thead>
+        <tbody id="payment-documents-tbody">
+            {% if widget.value %}
+                {% autoescape off %}
+                    {{ widget.value|safe }}
+                {% endautoescape %}
+            {% else %}
+                <tr>
+                    <td><input type="text" class="doc-number form-control"/></td>
+                    <td><input type="date" class="doc-date form-control"/></td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    {{ widget }}
+</div>
+
+<script src="{% static 'js/jquery.min.js' %}" defer></script>
+<script>
+    $(document).ready(function() {
+        const initialValue = '{{ widget.value }}';
+        if (initialValue) {
+            let pairs = initialValue.split(',');
+            $.each(pairs, function(index, value) {
+                let rowData = value.trim().split('-');
+                let newRow = ` <tr> <td><input type="text" class="doc-number form-control" value="${rowData[0]}"></td> <td><input type="date" class="doc-date form-control" value="${rowData[1]}"></td> </tr> `;
+                $("#payment-documents-tbody").append(newRow);
+            });
+        }
+        $('.widget-payment-document tbody').on('keyup change', '.doc-number,.doc-date', function() {
+            var paymentDocuments = [];
+            $('tbody tr').each(function(i, el) {
+                var docNumber = $(el).find('.doc-number').val();
+                var docDate = $(el).find('.doc-date').val();
+                if (docNumber && docDate) {
+                    paymentDocuments.push(docNumber + '-' + docDate);
+                }
+            });
+            $('#id_payment_document').val(paymentDocuments.join(', '));
+        });
+    }); 
+</script>

@@ -2,7 +2,7 @@ from django import forms
 from documents_сreating.models import DocumentUTD, UTDItem, Organization, VatRate, Currency, Status
 from django.forms import modelformset_factory
 from datetime import date
-from documents_сreating.widgets import OrganizationWidget
+from documents_сreating.widgets import OrganizationWidget, PaymentDocumentWidget
 
 
 class UtdDocumentForm(forms.ModelForm):
@@ -169,7 +169,7 @@ class UtdDocumentForm(forms.ModelForm):
             'basis_for_transfer': forms.TextInput(attrs={'class': 'form-control w-md-50'}),
             'data_transportation': forms.TextInput(attrs={'class': 'form-control w-md-50'}),
             'name': forms.TextInput(attrs={'class': 'form-control w-md-50'}),
-            'payment_document': forms.TextInput(attrs={'class': 'form-control w-md-50'}),
+            'payment_document': PaymentDocumentWidget(),
         }
         labels = {
             'name': 'УПД №',
