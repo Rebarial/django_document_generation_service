@@ -32,3 +32,7 @@ def add_nds(amount, nds_rate):
     if nds_rate not in (0, -1):
         return amount * (1 + nds_rate / 100)
     return amount
+
+@register.filter(name='field_by_key')
+def field_by_key(form, key):
+    return form[key]

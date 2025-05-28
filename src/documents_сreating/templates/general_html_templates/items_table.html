@@ -1,3 +1,6 @@
+{% load custom_filters %}
+{% load static %}
+<script src="{% static 'js/myjs/container.js' %}" defer></script>
 {{ formset.management_form }}
 
 <div class="card p-3" style="overflow: scroll!important;">
@@ -8,9 +11,9 @@
                 <th style="width: 30px; min-width: 30px;">#</th>
                 <th style="width: 30px; min-width: 30px;"></th>
                 
-                {%- for key, settings in column_settings.items() %}<!-- Перебираем наши настройки -->
+                {% for key, settings in column_settings.items %}
                     <th style="min-width: {{ settings.width }}; width: auto;">{{ settings.label }}</th>
-                {%- endfor %}
+                {% endfor %}
                 
                 <th style="width: 30px; min-width: 30px;"></th>
             </tr>
@@ -27,9 +30,9 @@
                         <button type="button" class="btn remove-row"><i class="fa-solid fa-minus"></i></button>
                     </td>
                     
-                    {%- for key, _ in column_settings.items() %}<!-- Формируем ячейки по полям формы -->
-                        <td>{{ form[key] }}</td>
-                    {%- endfor %}
+                    {% for key, _ in column_settings.items %}
+                        <td>{{ form|field_by_key:key }}</td>
+                    {% endfor %}
                     
                     <td>
                         <button type="button" class="btn  drag-handle" title="Перетащить"><i class="fas fa-arrows-alt"></i></button>

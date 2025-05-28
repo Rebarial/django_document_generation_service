@@ -91,6 +91,19 @@ class UtdDocumentCreateView(LoginRequiredMixin, CreateView):
         else:
             context['formset'] = UtdDocumentTableFormSet(queryset=UTDItem.objects.none())
 
+        context['column_settings'] = {
+            'code': {'label': 'Код товара', 'width': '90px'},
+            'name': {'label': 'Наименование', 'width': '190px'},
+            'type_code': {'label': 'Код вида товара', 'width': '90px'},
+            'unit': {'label': 'Единица измерения', 'width': '120px'},
+            'excise': {'label': 'Акциз', 'width': '90px'},
+            'quantity': {'label': 'Количество', 'width': '130px'},
+            'price': {'label': 'Цена', 'width': '140px'},
+            'sum': {'label': 'Сумма', 'width': '140px'},
+            'country': {'label': 'Страна', 'width': '140px'},
+            'gtd_number': {'label': 'ГТД', 'width': '130px'},
+        }
+
         return context
 
     def form_valid(self, form):

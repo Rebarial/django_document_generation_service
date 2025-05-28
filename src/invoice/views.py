@@ -79,6 +79,13 @@ class InvoiceDocumentCreateView(LoginRequiredMixin, CreateView):
            context['formset'] = InvoiceDocumentTableFormSet(queryset=object.items_docs.all())
         else:
             context['formset'] = InvoiceDocumentTableFormSet(queryset=InvoiceForPaymentItem.objects.none())
+        context['column_settings'] = {
+            'name': {'label': 'Наименование', 'width': '190px'},
+            'unit': {'label': 'Единица измерения', 'width': '100px'},
+            'quantity': {'label': 'Количество', 'width': '140px'},
+            'price': {'label': 'Цена', 'width': '150px'},
+            'sum': {'label': 'Сумма', 'width': '150px'}
+        }
         context['vat_rate'] = self.vat_rate
 
         return context
